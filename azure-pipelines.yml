@@ -1,0 +1,54 @@
+variables:
+  azureSubscription: "azureRm"
+  tfVersion: "0.12.16"
+
+name: $(Build.BuildId)
+
+trigger:
+- master
+
+stages:
+  - stage: Build
+    jobs:
+      - job:
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+        # - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+        #   displayName: 'Install Terraform $(tfVersion)'
+        #   inputs:
+        #     terraformVersion: '$(tfVersion)'
+            
+        - task: AzureCLI@1
+          displayName: 'Build task'
+          inputs:
+            azureSubscription: '$(azureSubscription)'
+            addSpnToEnvironment: true
+            scriptLocation: inlineScript
+            inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -build -tfVersion $(tfVersion)"
+
+  - stage: Deploy
+    dependsOn: [Build]
+    jobs:
+      - deployment: Deploy_dev
+        pool:
+          vmImage: 'Ubuntu-latest'
+        
+        environment: dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+              - checkout: self
+              # - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+              #   displayName: 'Install Terraform $(tfVersion)'
+              #   inputs:
+              #     terraformVersion: '$(tfVersion)'
+                  
+              - task: AzureCLI@1
+                displayName: 'Deploy task'
+                inputs:
+                  azureSubscription: '$(azureSubscription)'
+                  addSpnToEnvironment: true
+                  scriptLocation: inlineScript
+                  inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -deploy  -tfVersion $(tfVersion)"
