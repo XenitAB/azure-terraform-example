@@ -15,8 +15,7 @@ jobs:
       deploy:
         steps:
         - checkout: self
-          fetchDepth: 1
-          displayName: Get sources 
+          displayName: Get sources
             
         - task: AzureCLI@1
           displayName: 'Deploy task'
