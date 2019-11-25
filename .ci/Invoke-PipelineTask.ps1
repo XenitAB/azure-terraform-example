@@ -28,7 +28,8 @@ Param(
     [Parameter(Mandatory = $false, ParameterSetName = 'deploy')]
     [switch]$azureDevOps,
     [string]$tfVersion = "0.12.16",
-    [string]$tfPath = "$($PSScriptRoot)/../terraform/"
+    [string]$tfPath = "$($PSScriptRoot)/../terraform/",
+    [string]$environmentShort = "uat"
 )
 
 Begin {
@@ -71,6 +72,12 @@ Begin {
 }
 Process {
     Set-Location -Path $tfPath -ErrorAction Stop
+
+    if(!$($ENV:TF_VAR_environmentShort)) {
+        $ENV:TF_VAR_environmentShort = $environmentShort
+    }
+
+    $tfStateKey = "$($ENV:TF_VAR_environmentShort).terraform.tfstate"
     
     if ($azureDevOps) {
         Log-Message -message "INFO: Running Azure DevOps specific configuration"
@@ -106,7 +113,7 @@ Process {
             Log-Message -message "START: Build" -header
             try {
                 Log-Message -message "START: terraform init"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false"))
+                Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfStateKey)`""))
                 Log-Message -message "END: terraform init"
 
                 Log-Message -message "START: terraform plan"
@@ -128,7 +135,7 @@ Process {
             Log-Message -message "START: Deploy" -header
             try {
                 Log-Message -message "START: terraform init"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false"))
+                Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfStateKey)`""))
                 Log-Message -message "END: terraform init"
 
                 Log-Message -message "START: terraform apply"
