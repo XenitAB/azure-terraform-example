@@ -23,6 +23,4 @@ jobs:
             azureSubscription: '$(azureSubscription)'
             addSpnToEnvironment: true
             scriptLocation: inlineScript
-            inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -deploy -tfVersion $(tfVersion)"
-          env:
-            TF_VAR_environmentShort: ${{ parameters.environment }}
+            inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -deploy -tfVersion $(tfVersion) -environmentShort ${{ parameters.environment }}"

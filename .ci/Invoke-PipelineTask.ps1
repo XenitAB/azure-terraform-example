@@ -80,12 +80,7 @@ Begin {
 }
 Process {
     Set-Location -Path $tfPath -ErrorAction Stop
-
-    if(!$($ENV:TF_VAR_environmentShort)) {
-        $ENV:TF_VAR_environmentShort = $environmentShort
-    }
-
-    $tfStateKey = "$($ENV:TF_VAR_environmentShort).terraform.tfstate"
+    $tfStateKey = "$($environmentShort).terraform.tfstate"
     
     if ($azureDevOps) {
         Log-Message -message "INFO: Running Azure DevOps specific configuration"
@@ -123,17 +118,17 @@ Process {
                 Log-Message -message "START: terraform init"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfStateKey)`""))
                 try {
-                    Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($ENV:TF_VAR_environmentShort)")) -SilentNoExit
-                    Log-Message -message "INFO: terraform workspace $($ENV:TF_VAR_environmentShort) created"
+                    Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($environmentShort)")) -SilentNoExit
+                    Log-Message -message "INFO: terraform workspace $($environmentShort) created"
                 } catch {
-                    Log-Message -message "INFO: terraform workspace $($ENV:TF_VAR_environmentShort) already exists"
+                    Log-Message -message "INFO: terraform workspace $($environmentShort) already exists"
                 }
-                Log-Message -message "INFO: terraform workspace $($ENV:TF_VAR_environmentShort) selected"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($ENV:TF_VAR_environmentShort)"))
+                Log-Message -message "INFO: terraform workspace $($environmentShort) selected"
+                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
                 Log-Message -message "END: terraform init"
 
                 Log-Message -message "START: terraform plan"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin plan -input=false"))
+                Invoke-Call ([ScriptBlock]::Create("$tfBin plan -input=false -var-file=`"variables/$($environmentShort).tfvars`""))
                 Log-Message -message "END: terraform plan"
 
                 Log-Message -message "START: terraform validate"
@@ -153,17 +148,17 @@ Process {
                 Log-Message -message "START: terraform init"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfStateKey)`""))
                 try {
-                    Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($ENV:TF_VAR_environmentShort)")) -SilentNoExit
-                    Log-Message -message "INFO: terraform workspace $($ENV:TF_VAR_environmentShort) created"
+                    Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($environmentShort)")) -SilentNoExit
+                    Log-Message -message "INFO: terraform workspace $($environmentShort) created"
                 } catch {
-                    Log-Message -message "INFO: terraform workspace $($ENV:TF_VAR_environmentShort) already exists"
+                    Log-Message -message "INFO: terraform workspace $($environmentShort) already exists"
                 }
-                Log-Message -message "INFO: terraform workspace $($ENV:TF_VAR_environmentShort) selected"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($ENV:TF_VAR_environmentShort)"))
+                Log-Message -message "INFO: terraform workspace $($environmentShort) selected"
+                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
                 Log-Message -message "END: terraform init"
 
                 Log-Message -message "START: terraform apply"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin apply -input=false -auto-approve"))
+                Invoke-Call ([ScriptBlock]::Create("$tfBin apply -input=false -auto-approve -var-file=`"variables/$($environmentShort).tfvars`""))
                 Log-Message -message "END: terraform init"
             } catch {
                 $ErrorMessage = $_.Exception.Message
