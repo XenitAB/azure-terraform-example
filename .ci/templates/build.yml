@@ -1,18 +1,15 @@
 parameters:
-  deployment: ""
+  jobName: ""
   pool: ""
   environment: ""
 
 jobs:
-- deployment: ${{ parameters.deployment }}
+- job: ${{ parameters.jobName }}
   displayName: Build ${{ parameters.environment }}
   pool:
     vmImage: ${{ parameters.pool }}
   continueOnError: false
-  steps:
-  - checkout: self
-    displayName: Get sources 
-      
+  steps:      
   - task: AzureCLI@1
     displayName: 'Build task'
     inputs:

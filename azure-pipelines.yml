@@ -13,7 +13,7 @@ stages:
   jobs:
   - template: .ci/templates/build.yml
     parameters:
-      deployment: Build_uat
+      jobName: Build_uat
       pool: $(pool)
       environment: uat
 
@@ -21,7 +21,7 @@ stages:
   jobs:
   - template: .ci/templates/build.yml
     parameters:
-      deployment: Build_prod
+      jobName: Build_prod
       pool: $(pool)
       environment: prod
       
