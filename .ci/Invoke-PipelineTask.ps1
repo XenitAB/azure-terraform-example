@@ -29,7 +29,7 @@ Param(
     [switch]$azureDevOps,
     [string]$tfVersion = "0.12.16",
     [string]$tfPath = "$($PSScriptRoot)/../terraform/",
-    [string]$environmentShort = "uat"
+    [string]$environmentShort = "dev"
 )
 
 Begin {
@@ -39,12 +39,20 @@ Begin {
     function Invoke-Call {
         param (
             [scriptblock]$ScriptBlock,
-            [string]$ErrorAction = $ErrorActionPreference
+            [string]$ErrorAction = $ErrorActionPreference,
+            [switch]$SilentNoExit        
         )
-        & @ScriptBlock
-        if (($lastexitcode -ne 0) -and $ErrorAction -eq "Stop") {
-            exit $lastexitcode
+        if ($SilentNoExit) {
+            & @ScriptBlock 2>$null
+        } else {
+            & @ScriptBlock
+
+            if (($lastexitcode -ne 0) -and $ErrorAction -eq "Stop") {
+                exit $lastexitcode
+            }
         }
+        
+
     }
 
     function Log-Message {
@@ -114,7 +122,13 @@ Process {
             try {
                 Log-Message -message "START: terraform init"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfStateKey)`""))
-                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($ENV:TF_VAR_environmentShort); true"))
+                try {
+                    Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($ENV:TF_VAR_environmentShort)")) -SilentNoExit
+                    Log-Message -message "INFO: terraform workspace $($ENV:TF_VAR_environmentShort) created"
+                } catch {
+                    Log-Message -message "INFO: terraform workspace $($ENV:TF_VAR_environmentShort) already exists"
+                }
+                Log-Message -message "INFO: terraform workspace $($ENV:TF_VAR_environmentShort) selected"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($ENV:TF_VAR_environmentShort)"))
                 Log-Message -message "END: terraform init"
 
@@ -138,7 +152,13 @@ Process {
             try {
                 Log-Message -message "START: terraform init"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfStateKey)`""))
-                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($ENV:TF_VAR_environmentShort); true"))
+                try {
+                    Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($ENV:TF_VAR_environmentShort)")) -SilentNoExit
+                    Log-Message -message "INFO: terraform workspace $($ENV:TF_VAR_environmentShort) created"
+                } catch {
+                    Log-Message -message "INFO: terraform workspace $($ENV:TF_VAR_environmentShort) already exists"
+                }
+                Log-Message -message "INFO: terraform workspace $($ENV:TF_VAR_environmentShort) selected"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($ENV:TF_VAR_environmentShort)"))
                 Log-Message -message "END: terraform init"
 
