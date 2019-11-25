@@ -2,7 +2,7 @@
 Terraform example for setting up hub-and-spoke in Azure using Azure DevOps (CI/CD)
 
 # Before using
-## Create an AWS connection
+## Create an Azure connection
 Go to (in Azure DevOps) Project Settings > Service connections > New service connection > Azure Resource Manager > Name will be used as `azureSubscription` in the azure-pipelines.yml variables
 
 ## Add the resource group and storage account/container used by `main.tf`:

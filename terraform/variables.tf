@@ -10,12 +10,12 @@ variable "locationShort" {
 
 variable "environment" {
   description = "The environment to use for the deploy"
-  default = "development"
+  default = "useracceptancetest"
 }
 
 variable "environmentShort" {
   description = "The environment (short name) to use for the deploy"
-  default = "dev"
+  default = "uat"
 }
 
 variable "vnetConfig" {
@@ -23,11 +23,11 @@ variable "vnetConfig" {
   type = map
 
   default = {
-    hub = {
+    uat = {
       addressSpace = [ "10.100.0.0/16" ]
     }
-    spoke1 = {
-      addressSpace = [ "10.101.0.0/24" ]
+    prod = {
+      addressSpace = [ "10.101.0.0/16" ]
     }
   }
 }

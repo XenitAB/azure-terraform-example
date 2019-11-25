@@ -1,0 +1,16 @@
+parameters:
+  azureSubscription: ""
+  tfVersion: ""
+
+jobs:
+  - job:
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:            
+    - task: AzureCLI@1
+      displayName: 'Build task'
+      inputs:
+        azureSubscription: '$(azureSubscription)'
+        addSpnToEnvironment: true
+        scriptLocation: inlineScript
+        inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -build -tfVersion $(tfVersion)"
