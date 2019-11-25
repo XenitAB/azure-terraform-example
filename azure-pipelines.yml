@@ -13,26 +13,40 @@ stages:
   jobs:
   - template: .ci/templates/build.yml
     parameters:
-      jobName: Build_uat
+      jobName: Build_dev
       pool: $(pool)
-      environment: uat
+      environment: dev
+  - template: .ci/templates/build.yml
+    parameters:
+      jobName: Build_qa
+      pool: $(pool)
+      environment: qa
   - template: .ci/templates/build.yml
     parameters:
       jobName: Build_prod
       pool: $(pool)
       environment: prod
       
-- stage: Deploy_uat
+- stage: Deploy_dev
   dependsOn: [Build]
   jobs:
   - template: .ci/templates/deploy.yml
     parameters:
-      deployment: Deploy_uat
+      deployment: Deploy_dev
       pool: $(pool)
-      environment: uat
+      environment: dev
+
+- stage: Deploy_qa
+  dependsOn: [Build, Deploy_dev]
+  jobs:
+  - template: .ci/templates/deploy.yml
+    parameters:
+      deployment: Deploy_dev
+      pool: $(pool)
+      environment: dev
 
 - stage: Deploy_prod
-  dependsOn: [Build, Deploy_uat]
+  dependsOn: [Build, Deploy_qa]
   jobs:
   - template: .ci/templates/deploy.yml
     parameters:

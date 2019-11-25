@@ -17,11 +17,14 @@ variable "vnetConfig" {
   type = map
 
   default = {
-    uat = {
+    dev = {
       addressSpace = [ "10.100.0.0/16" ]
     }
-    prod = {
+    qa = {
       addressSpace = [ "10.101.0.0/16" ]
+    }
+    prod = {
+      addressSpace = [ "10.102.0.0/16" ]
     }
   }
 }
