@@ -8,7 +8,7 @@ trigger:
 - master
 
 stages:
-  - template: templates/build-service.yml
+  - template: .ci/templates/build.yml
     parameters:
       azureSubscription: $(azureSubscription)
       tfVersion: $(tfVersion)
