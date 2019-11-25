@@ -11,16 +11,27 @@ trigger:
 stages:
 - stage: Build_uat
   jobs:
+<<<<<<< HEAD
   - template: .ci/templates/build.yml
+=======
+  - job: Build_uat
+    template: .ci/templates/build.yml
+>>>>>>> parent of bacfa71... .
     parameters:
       jobName: Build_uat
       pool: $(pool)
       environment: uat
+<<<<<<< HEAD
 
 - stage: Build_prod
   dependsOn: Build_uat
   jobs:
   - template: .ci/templates/build.yml
+=======
+  - job: Build_prod
+    dependsOn: Build_uat
+    template: .ci/templates/build.yml
+>>>>>>> parent of bacfa71... .
     parameters:
       jobName: Build_prod
       pool: $(pool)
