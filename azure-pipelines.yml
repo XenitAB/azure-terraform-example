@@ -5,7 +5,7 @@ variables:
 name: $(Build.BuildId)
 
 trigger:
-- master
+- uat
 
 stages:
   - template: .ci/templates/build.yml
