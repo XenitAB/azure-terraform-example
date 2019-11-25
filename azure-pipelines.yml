@@ -10,24 +10,4 @@ trigger:
 
 stages:
   - template: .ci/templates/build.yml
-
-  - stage: Deploy_uat
-    dependsOn: [Build]
-    jobs:
-      - deployment: Deploy_uat
-        pool:
-          vmImage: 'Ubuntu-latest'
-        
-        environment: uat
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-              - checkout: self
-              - task: AzureCLI@1
-                displayName: 'Deploy task'
-                inputs:
-                  azureSubscription: '$(azureSubscription)'
-                  addSpnToEnvironment: true
-                  scriptLocation: inlineScript
-                  inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -deploy  -tfVersion $(tfVersion)"
+  - template: .ci/templates/stages.yml

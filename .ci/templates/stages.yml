@@ -1,0 +1,18 @@
+stages:
+- stage: Deploy_uat
+  dependsOn: Build
+  jobs:
+    - template: deploy.yml
+      parameters:
+        deployment: Deploy_uat
+        pool: $(pool)
+        environment: uat
+
+- stage: Deploy_prod
+  dependsOn: [Build, Deploy_uat]
+  jobs:
+    - template: deploy.yml
+      parameters:
+        deployment: Deploy_prod
+        pool: $(pool)
+        environment: prod
