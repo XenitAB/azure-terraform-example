@@ -23,7 +23,7 @@ stages:
       environment: prod
       
 - stage: Deploy_uat
-  dependsOn: [Build, Build_prod]
+  dependsOn: [Build]
   jobs:
   - template: .ci/templates/deploy.yml
     parameters:
