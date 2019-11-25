@@ -8,14 +8,8 @@ variable "locationShort" {
   default = "we"
 }
 
-variable "environment" {
-  description = "The environment to use for the deploy"
-  default = "useracceptancetest"
-}
-
 variable "environmentShort" {
   description = "The environment (short name) to use for the deploy"
-  default = "uat"
 }
 
 variable "vnetConfig" {
