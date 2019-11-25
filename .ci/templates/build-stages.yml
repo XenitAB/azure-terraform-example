@@ -1,0 +1,16 @@
+stages:
+- stage: Build_uat
+  jobs:
+    - template: build.yml
+      parameters:
+        buildName: Build_uat
+        pool: $(pool)
+        environment: uat
+
+- stage: Build_prod
+  jobs:
+    - template: build.yml
+      parameters:
+        buildName: Build_prod
+        pool: $(pool)
+        environment: prod

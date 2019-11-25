@@ -1,7 +1,12 @@
+parameters:
+  buildName: ""
+  pool: ""
+  environment: ""
+
 stages:
-- stage: Build
+- stage: ${{ parameters.buildName }}
   jobs:
-  - job: Build
+  - job: ${{ parameters.buildName }}
     pool:
       vmImage: $(pool)
     steps:
@@ -12,3 +17,5 @@ stages:
         addSpnToEnvironment: true
         scriptLocation: inlineScript
         inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -build -tfVersion $(tfVersion)"
+      env:
+        TF_VAR_environmentShort: ${{ parameters.environment }}

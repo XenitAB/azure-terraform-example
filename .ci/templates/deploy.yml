@@ -26,4 +26,4 @@ jobs:
             scriptLocation: inlineScript
             inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -deploy -tfVersion $(tfVersion)"
           env:
-            TF_environmentShort: ${{ parameters.environment }}
+            TF_VAR_environmentShort: ${{ parameters.environment }}

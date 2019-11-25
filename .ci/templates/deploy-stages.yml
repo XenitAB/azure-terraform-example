@@ -1,6 +1,6 @@
 stages:
 - stage: Deploy_uat
-  dependsOn: Build
+  dependsOn: [Build_uat, Build_prod]
   jobs:
     - template: deploy.yml
       parameters:
@@ -9,7 +9,7 @@ stages:
         environment: uat
 
 - stage: Deploy_prod
-  dependsOn: [Build, Deploy_uat]
+  dependsOn: [Build_prod, Deploy_uat]
   jobs:
     - template: deploy.yml
       parameters:
