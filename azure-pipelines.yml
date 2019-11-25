@@ -1,7 +1,7 @@
 variables:
   azureSubscription: "azureRm"
   tfVersion: "0.12.16"
-  pool: 'Ubuntu-latest'
+  pool: 'ubuntu-latest'
 
 name: $(Build.BuildId)
 

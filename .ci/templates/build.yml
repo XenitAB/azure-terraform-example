@@ -3,7 +3,7 @@ stages:
   jobs:
   - job: Build
     pool:
-      name: $(pool)
+      vmImage: $(pool)
     steps:
     - task: AzureCLI@1
       displayName: 'Build task'
