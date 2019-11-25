@@ -114,6 +114,8 @@ Process {
             try {
                 Log-Message -message "START: terraform init"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfStateKey)`""))
+                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($ENV:TF_VAR_environmentShort); true"))
+                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($ENV:TF_VAR_environmentShort)"))
                 Log-Message -message "END: terraform init"
 
                 Log-Message -message "START: terraform plan"
@@ -135,6 +137,8 @@ Process {
             Log-Message -message "START: Deploy" -header
             try {
                 Log-Message -message "START: terraform init"
+                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($ENV:TF_VAR_environmentShort); true"))
+                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($ENV:TF_VAR_environmentShort)"))
                 Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfStateKey)`""))
                 Log-Message -message "END: terraform init"
 
