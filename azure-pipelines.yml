@@ -41,9 +41,9 @@ stages:
   jobs:
   - template: .ci/templates/deploy.yml
     parameters:
-      deployment: Deploy_dev
+      deployment: Deploy_qa
       pool: $(pool)
-      environment: dev
+      environment: qa
 
 - stage: Deploy_prod
   dependsOn: [Build, Deploy_qa]
