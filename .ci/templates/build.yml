@@ -1,12 +1,10 @@
-parameters:
-  azureSubscription: ""
-  tfVersion: ""
-
-jobs:
-  - job:
+stages:
+- stage: Build
+  jobs:
+  - job: Build
     pool:
-      vmImage: 'ubuntu-latest'
-    steps:            
+      name: $(pool)
+    steps:
     - task: AzureCLI@1
       displayName: 'Build task'
       inputs:
