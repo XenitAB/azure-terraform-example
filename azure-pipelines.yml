@@ -9,5 +9,5 @@ trigger:
 - uat
 
 stages:
-  - template: .ci/templates/build.yml
-  - template: .ci/templates/stages.yml
+  - template: .ci/templates/build-stages.yml
+  - template: .ci/templates/deploy-stages.yml
