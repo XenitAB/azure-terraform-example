@@ -12,7 +12,6 @@ terraform {
     resource_group_name  = "<resourceGroupName>"
     storage_account_name = "<storageAccountName>"
     container_name       = "<containerName>"
-    key                  = "dev.terraform.tfstate"
   }
 }
 ```
