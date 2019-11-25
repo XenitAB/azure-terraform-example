@@ -6,7 +6,7 @@ variables:
 name: $(Build.BuildId)
 
 trigger:
-- uat
+- master
 
 stages:
 - stage: Build
