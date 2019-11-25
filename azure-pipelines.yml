@@ -11,21 +11,16 @@ trigger:
 stages:
 - stage: Build
   jobs:
-  - job: Build_uat
-    steps:
-    - template: .ci/templates/build.yml
-      parameters:
-        jobName: Build_uat
-        pool: $(pool)
-        environment: uat
-  - job: Build_prod
-    dependsOn: Build_uat
-    steps:
-    - template: .ci/templates/build.yml
-      parameters:
-        jobName: Build_prod
-        pool: $(pool)
-        environment: prod
+  - template: .ci/templates/build.yml
+    parameters:
+      jobName: Build_uat
+      pool: $(pool)
+      environment: uat
+  - template: .ci/templates/build.yml
+    parameters:
+      jobName: Build_prod
+      pool: $(pool)
+      environment: prod
       
 - stage: Deploy_uat
   dependsOn: [Build, Build_prod]
