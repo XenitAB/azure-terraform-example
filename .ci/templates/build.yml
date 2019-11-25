@@ -9,21 +9,17 @@ jobs:
   pool:
     vmImage: ${{ parameters.pool }}
   continueOnError: false
-  environment: ${{ parameters.environment }}
-  strategy: 
-    runOnce:
-      deploy:
-        steps:
-        - checkout: self
-          fetchDepth: 1
-          displayName: Get sources 
-            
-        - task: AzureCLI@1
-          displayName: 'Deploy task'
-          inputs:
-            azureSubscription: '$(azureSubscription)'
-            addSpnToEnvironment: true
-            scriptLocation: inlineScript
-            inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -build -tfVersion $(tfVersion)"
-          env:
-            TF_VAR_environmentShort: ${{ parameters.environment }}
+  steps:
+  - checkout: self
+    fetchDepth: 1
+    displayName: Get sources 
+      
+  - task: AzureCLI@1
+    displayName: 'Build task'
+    inputs:
+      azureSubscription: '$(azureSubscription)'
+      addSpnToEnvironment: true
+      scriptLocation: inlineScript
+      inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -build -tfVersion $(tfVersion)"
+    env:
+      TF_VAR_environmentShort: ${{ parameters.environment }}
