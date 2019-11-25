@@ -2,6 +2,7 @@ parameters:
   deployment: ""
   pool: ""
   environment: ""
+  azureSubscription: ""
 
 jobs:
 - deployment: ${{ parameters.deployment }}
@@ -20,7 +21,7 @@ jobs:
         - task: AzureCLI@1
           displayName: 'Deploy task'
           inputs:
-            azureSubscription: '$(azureSubscription)'
+            azureSubscription: '${{ parameters.azureSubscription }}'
             addSpnToEnvironment: true
             scriptLocation: inlineScript
             inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -deploy -tfVersion $(tfVersion) -environmentShort ${{ parameters.environment }}"

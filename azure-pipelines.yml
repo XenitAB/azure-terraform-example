@@ -16,16 +16,19 @@ stages:
       jobName: Build_dev
       pool: $(pool)
       environment: dev
+      azureSubscription: $(azureSubscription)
   - template: .ci/templates/build.yml
     parameters:
       jobName: Build_qa
       pool: $(pool)
       environment: qa
+      azureSubscription: $(azureSubscription)
   - template: .ci/templates/build.yml
     parameters:
       jobName: Build_prod
       pool: $(pool)
       environment: prod
+      azureSubscription: $(azureSubscription)
       
 - stage: Deploy_dev
   dependsOn: [Build]
@@ -35,6 +38,7 @@ stages:
       deployment: Deploy_dev
       pool: $(pool)
       environment: dev
+      azureSubscription: $(azureSubscription)
 
 - stage: Deploy_qa
   dependsOn: [Build, Deploy_dev]
@@ -44,6 +48,7 @@ stages:
       deployment: Deploy_qa
       pool: $(pool)
       environment: qa
+      azureSubscription: $(azureSubscription)
 
 - stage: Deploy_prod
   dependsOn: [Build, Deploy_qa]
@@ -53,3 +58,4 @@ stages:
       deployment: Deploy_prod
       pool: $(pool)
       environment: prod
+      azureSubscription: $(azureSubscription)
