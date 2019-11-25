@@ -9,5 +9,36 @@ trigger:
 - uat
 
 stages:
-  - template: .ci/templates/build-stages.yml
-  - template: .ci/templates/deploy-stages.yml
+- stage: Build_uat
+  jobs:
+  - template: .ci/templates/build.yml
+    parameters:
+      deployment: Build_uat
+      pool: $(pool)
+      environment: uat
+
+- stage: Build_prod
+  jobs:
+  - template: .ci/templates/build.yml
+    parameters:
+      deployment: Build_prod
+      pool: $(pool)
+      environment: prod
+      
+- stage: Deploy_uat
+  dependsOn: [Build_uat, Build_prod]
+  jobs:
+  - template: .ci/templates/deploy.yml
+    parameters:
+      deployment: Deploy_uat
+      pool: $(pool)
+      environment: uat
+
+- stage: Deploy_prod
+  dependsOn: [Build_prod, Deploy_uat]
+  jobs:
+  - template: .ci/templates/deploy.yml
+    parameters:
+      deployment: Deploy_prod
+      pool: $(pool)
+      environment: prod
