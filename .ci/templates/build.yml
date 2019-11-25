@@ -1,0 +1,21 @@
+parameters:
+  jobName: ""
+  pool: ""
+  environment: ""
+
+jobs:
+- job: ${{ parameters.jobName }}
+  displayName: Build ${{ parameters.environment }}
+  pool:
+    vmImage: ${{ parameters.pool }}
+  continueOnError: false
+  steps:      
+  - task: AzureCLI@1
+    displayName: 'Build task'
+    inputs:
+      azureSubscription: '$(azureSubscription)'
+      addSpnToEnvironment: true
+      scriptLocation: inlineScript
+      inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -build -tfVersion $(tfVersion)"
+    env:
+      TF_VAR_environmentShort: ${{ parameters.environment }}

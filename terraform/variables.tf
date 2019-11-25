@@ -8,14 +8,8 @@ variable "locationShort" {
   default = "we"
 }
 
-variable "environment" {
-  description = "The environment to use for the deploy"
-  default = "development"
-}
-
 variable "environmentShort" {
   description = "The environment (short name) to use for the deploy"
-  default = "dev"
 }
 
 variable "vnetConfig" {
@@ -23,11 +17,11 @@ variable "vnetConfig" {
   type = map
 
   default = {
-    hub = {
+    uat = {
       addressSpace = [ "10.100.0.0/16" ]
     }
-    spoke1 = {
-      addressSpace = [ "10.101.0.0/24" ]
+    prod = {
+      addressSpace = [ "10.101.0.0/16" ]
     }
   }
 }

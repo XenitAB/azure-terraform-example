@@ -1,0 +1,28 @@
+parameters:
+  deployment: ""
+  pool: ""
+  environment: ""
+
+jobs:
+- deployment: ${{ parameters.deployment }}
+  displayName: Deploy to ${{ parameters.environment }}
+  pool:
+    vmImage: ${{ parameters.pool }}
+  continueOnError: false
+  environment: ${{ parameters.environment }}
+  strategy: 
+    runOnce:
+      deploy:
+        steps:
+        - checkout: self
+          displayName: Get sources
+            
+        - task: AzureCLI@1
+          displayName: 'Deploy task'
+          inputs:
+            azureSubscription: '$(azureSubscription)'
+            addSpnToEnvironment: true
+            scriptLocation: inlineScript
+            inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -deploy -tfVersion $(tfVersion)"
+          env:
+            TF_VAR_environmentShort: ${{ parameters.environment }}
