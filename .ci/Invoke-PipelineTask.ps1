@@ -30,28 +30,19 @@ Param(
     [string]$tfVersion = "0.12.16",
     [string]$tfPath = "$($PSScriptRoot)/../terraform/",
     [string]$environmentShort = "dev",
-    [string]$artifactPath
+    [string]$artifactPath,
+    [bool]$createStorageAccount = $true,
+    [string]$tfBackendKey = "$($environmentShort).terraform.tfstate",
+    [string]$tfBackendResourceGroupLocation = "West Europe",
+    [string]$tfBackendResourceGroupLocationShort = "we",
+    [string]$tfBackendResourceGroup = "rg-$($environmentShort)-$($tfBackendResourceGroupLocationShort)-tfstate",
+    [string]$tfBackendStorageAccountName = "strg$($environmentShort)$($tfBackendResourceGroupLocationShort)tfstate",
+    [string]$tfBackendStorageAccountKind = "StorageV2",
+    [string]$tfBackendContainerName = "tfstate"
 )
 
 Begin {
     $ErrorActionPreference = "Stop"
-
-    if(!$($artifactPath)) {
-        if (!($ENV:IsWindows) -or $($ENV:IsWindows) -eq $false) {
-            $artifactPath = "/tmp/$($environmentShort)-terraform-output"
-        } else {
-            $artifactPath = "$($ENV:TMP)\$($environmentShort)-terraform-output"
-        }
-        if (!$(Test-Path $artifactPath)) {
-            New-Item -Path $artifactPath -ItemType Directory | Out-Null
-            Log-Message -message "INFO: artifactPath ($($artifactPath)) created."
-        } else {
-            Log-Message -message "INFO: artifactPath ($($artifactPath)) already exists."
-        }
-    }
-
-    $tfPlanFile = "$($artifactPath)/$($environmentShort).tfplan"
-    $tfStateKey = "$($environmentShort).terraform.tfstate"
 
     # Function to retrun error code correctly from binaries
     function Invoke-Call {
@@ -69,8 +60,6 @@ Begin {
                 exit $lastexitcode
             }
         }
-        
-
     }
 
     function Log-Message {
@@ -95,6 +84,22 @@ Begin {
             Write-Output ""
         }
     }
+
+    if(!$($artifactPath)) {
+        if (!($ENV:IsWindows) -or $($ENV:IsWindows) -eq $false) {
+            $artifactPath = "/tmp/$($environmentShort)-terraform-output"
+        } else {
+            $artifactPath = "$($ENV:TMP)\$($environmentShort)-terraform-output"
+        }
+        if (!$(Test-Path $artifactPath)) {
+            New-Item -Path $artifactPath -ItemType Directory | Out-Null
+            Log-Message -message "INFO: artifactPath ($($artifactPath)) created."
+        } else {
+            Log-Message -message "INFO: artifactPath ($($artifactPath)) already exists."
+        }
+    }
+
+    $tfPlanFile = "$($artifactPath)/$($environmentShort).tfplan"
 }
 Process {
     Set-Location -Path $tfPath -ErrorAction Stop
@@ -120,6 +125,32 @@ Process {
         $ENV:ARM_CLIENT_ID = $ENV:servicePrincipalId
         $ENV:ARM_CLIENT_SECRET = $ENV:servicePrincipalKey
         $ENV:ARM_TENANT_ID = $ENV:tenantId
+
+        if ($createStorageAccount) {
+            $createRg = Invoke-Call ([ScriptBlock]::Create("$azBin group create --name `"$($tfBackendResourceGroup)`" --location `"$($tfBackendResourceGroupLocation)`" --output json")) | ConvertFrom-Json
+            if ($createRg.properties.provisioningState -eq "Succeeded") {
+                Log-Message -message "INFO: Azure Resource Group $($tfBackendResourceGroup) successfully provisioned in $($tfBackendResourceGroupLocation)."
+            } else {
+                Log-Message -message "ERROR: Azure Resource Group $($tfBackendResourceGroup) failed to provision in $($tfBackendResourceGroupLocation)."
+                exit 1
+            }
+
+            $createStrg = Invoke-Call ([ScriptBlock]::Create("$azBin storage account create --resource-group `"$($tfBackendResourceGroup)`" --name `"$($tfBackendStorageAccountName)`" --kind `"$($tfBackendStorageAccountKind)`" --output json")) | ConvertFrom-Json
+            if ($createStrg.provisioningState -eq "Succeeded") {
+                Log-Message -message "INFO: Azure Storage Account $($tfBackendStorageAccountName) successfully provisioned in resource group $($tfBackendResourceGroup)."
+            } else {
+                Log-Message -message "ERROR: Azure Storage Account $($tfBackendStorageAccountName) failed to provision in resource group $($tfBackendResourceGroup)."
+                exit 1
+            }
+
+            $createContainer = Invoke-Call ([ScriptBlock]::Create("$azBin storage container create --account-name `"$($tfBackendStorageAccountName)`" --name `"$($tfBackendContainerName)`" --output json")) | ConvertFrom-Json
+            if ($createContainer.created -eq $true) {
+                Log-Message -message "INFO: Azure Storage Account Container $($tfBackendContainerName) created in $($tfBackendStorageAccountName)."
+            } else {
+                Log-Message -message "INFO: Azure Storage Account Container $($tfBackendContainerName) already exists in $($tfBackendStorageAccountName)."
+            }
+        }
+
     } else {
         try {
             $tfBin = $(Get-Command terraform -ErrorAction Stop)
@@ -133,7 +164,7 @@ Process {
             Log-Message -message "START: Build" -header
             try {
                 Log-Message -message "START: terraform init"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfStateKey)`""))
+                Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfBackendKey)`" -backend-config=`"resource_group_name=$($tfBackendResourceGroup)`" -backend-config=`"storage_account_name=$($tfBackendStorageAccountName)`" -backend-config=`"container_name=$($tfBackendContainerName)`""))
                 try {
                     Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($environmentShort)")) -SilentNoExit
                     Log-Message -message "INFO: terraform workspace $($environmentShort) created"
@@ -163,7 +194,7 @@ Process {
             Log-Message -message "START: Deploy" -header
             try {
                 Log-Message -message "START: terraform init"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfStateKey)`""))
+                Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfBackendKey)`" -backend-config=`"resource_group_name=$($tfBackendResourceGroup)`" -backend-config=`"storage_account_name=$($tfBackendStorageAccountName)`" -backend-config=`"container_name=$($tfBackendContainerName)`""))
                 try {
                     Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($environmentShort)")) -SilentNoExit
                     Log-Message -message "INFO: terraform workspace $($environmentShort) created"
@@ -176,7 +207,6 @@ Process {
 
                 Log-Message -message "START: terraform apply"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin apply -input=false -auto-approve `"$($tfPlanFile)`""))
-                #Invoke-Call ([ScriptBlock]::Create("$tfBin apply -input=false -auto-approve `"$($tfPlanFile)`""))
                 Log-Message -message "END: terraform apply"
             } catch {
                 $ErrorMessage = $_.Exception.Message
