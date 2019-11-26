@@ -1,19 +1,19 @@
-# azure-terraform-hubspoke
-Terraform example for setting up hub-and-spoke in Azure using Azure DevOps (CI/CD)
+# azure-terraform-example
+Terraform example to have a short developer loop and pipeline in Azure DevOps (CI/CD).
 
 # Before using
 ## Create an Azure connection
-Go to (in Azure DevOps) Project Settings > Service connections > New service connection > Azure Resource Manager > Name will be used as `azureSubscription` in the azure-pipelines.yml variables
+Go to (in Azure DevOps) Project Settings > Service connections > New service connection > Azure Resource Manager > Name will be used as `azureSubscription` in the pipeline yaml (`.ci/pipeline-tf-infra-core` as an example.)
 
-## Add the resource group and storage account/container used by `main.tf`:
-```
-terraform {
-  backend "azurerm" {
-    resource_group_name  = "<resourceGroupName>"
-    storage_account_name = "<storageAccountName>"
-    container_name       = "<containerName>"
-  }
-}
+## Modify .ci/Invoke-PipelineTask.ps1 to reflect your environment:
+```powershell
+    [string]$tfBackendKey = "$($environmentShort).terraform.tfstate",
+    [string]$tfBackendResourceGroupLocation = "West Europe",
+    [string]$tfBackendResourceGroupLocationShort = "we",
+    [string]$tfBackendResourceGroup = "rg-$($environmentShort)-$($tfBackendResourceGroupLocationShort)-tfstate",
+    [string]$tfBackendStorageAccountName = "strg$($environmentShort)$($tfBackendResourceGroupLocationShort)tfstate",
+    [string]$tfBackendStorageAccountKind = "StorageV2",
+    [string]$tfBackendContainerName = "tfstate"
 ```
 
 # Setting up
@@ -22,7 +22,7 @@ terraform {
 ```
 az login
 
-cd terraform
+cd tf-core-infra
 
 terraform init
 terraform plan
@@ -34,9 +34,9 @@ terraform apply
 ```
 az login
 
-pwsh .ci/Invoke-PipelineTask.ps1 -build
-pwsh .ci/Invoke-PipelineTask.ps1 -deploy
+pwsh .ci/Invoke-PipelineTask.ps1 -tfFolderName tf-core-infra -build
+pwsh .ci/Invoke-PipelineTask.ps1 -tfFolderName tf-core-infra -deploy
 ```
 
 ### Azure DevOps
-The recommended way of running it, since all the configuration required is included. Add the service connection and modify the variable `azureSubscription` to use azure-pipelines.yml.
+The recommended way of running it, since all the configuration required is included. Add the service connection and modify the variable variables to reflect your environment, see `.ci/pipeline-tf-infra-core.yml` for an example.
