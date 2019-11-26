@@ -43,3 +43,6 @@ The recommended way of running it, since all the configuration required is inclu
 
 ### Configuring Azure AD permissions
 If you are trying out `tf-governance` and get permission denied in the pipeline, make sure you add `Directory.ReadWrite.All` and `Application.ReadWrite.All` to your service principal for the `Azure Active Directory Graph` API (it's under the `Supported legacy APIs` section). You also need to grant admin consent to these permissions.
+
+## Boilerplate
+If you want to create a new terraform setup, copy the `tf-boilerplate` folder and `.ci/pipeline-tf-boilerplate.yml` (with your new names). Make sure to update the pipeline yaml where it says boilerplate to your new setup.
