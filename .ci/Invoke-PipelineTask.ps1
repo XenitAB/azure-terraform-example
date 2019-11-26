@@ -36,6 +36,23 @@ Param(
 Begin {
     $ErrorActionPreference = "Stop"
 
+    if(!$($artifactPath)) {
+        if (!($ENV:IsWindows) -or $($ENV:IsWindows) -eq $false) {
+            $artifactPath = "/tmp/$($environmentShort)-terraform-output"
+        } else {
+            $artifactPath = "$($ENV:TMP)\$($environmentShort)-terraform-output"
+        }
+        if (!$(Test-Path $artifactPath)) {
+            New-Item -Path $artifactPath -ItemType Directory | Out-Null
+            Log-Message -message "INFO: artifactPath ($($artifactPath)) created."
+        } else {
+            Log-Message -message "INFO: artifactPath ($($artifactPath)) already exists."
+        }
+    }
+
+    $tfPlanFile = "$($artifactPath)/$($environmentShort).tfplan"
+    $tfStateKey = "$($environmentShort).terraform.tfstate"
+
     # Function to retrun error code correctly from binaries
     function Invoke-Call {
         param (
@@ -81,23 +98,6 @@ Begin {
 }
 Process {
     Set-Location -Path $tfPath -ErrorAction Stop
-    $tfStateKey = "$($environmentShort).terraform.tfstate"
-
-    if(!$($artifactPath)) {
-        if (!($ENV:IsWindows) -or $($ENV:IsWindows) -eq $false) {
-            $artifactPath = "/tmp/$($environmentShort)-terraform-output"
-        } else {
-            $artifactPath = "$($ENV:TMP)\$($environmentShort)-terraform-output"
-        }
-        if (!$(Test-Path $artifactPath)) {
-            New-Item -Path $artifactPath -ItemType Directory | Out-Null
-            Log-Message -message "INFO: artifactPath ($($artifactPath)) created."
-        } else {
-            Log-Message -message "INFO: artifactPath ($($artifactPath)) already exists."
-        }
-    }
-
-    $tfPlanFile = "$($artifactPath)/$($environmentShort).tfplan"
 
     if ($azureDevOps) {
         Log-Message -message "INFO: Running Azure DevOps specific configuration"
