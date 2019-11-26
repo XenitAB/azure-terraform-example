@@ -41,7 +41,7 @@ Param(
     [string]$tfBackendResourceGroup = "rg-$($environmentShort)-$($tfBackendResourceGroupLocationShort)-tfstate",
     [string]$tfBackendStorageAccountName = "strg$($environmentShort)$($tfBackendResourceGroupLocationShort)tfstate",
     [string]$tfBackendStorageAccountKind = "StorageV2",
-    [string]$tfBackendContainerName = "tfstate"
+    [string]$tfBackendContainerName = "tfstate-$($tfFolderName)"
 )
 
 Begin {
@@ -90,9 +90,9 @@ Begin {
 
     if(!$($artifactPath)) {
         if (!($ENV:IsWindows) -or $($ENV:IsWindows) -eq $false) {
-            $artifactPath = "/tmp/$($environmentShort)-terraform-output"
+            $artifactPath = "/tmp/$($environmentShort)-$($tfFolderName)-terraform-output"
         } else {
-            $artifactPath = "$($ENV:TMP)\$($environmentShort)-terraform-output"
+            $artifactPath = "$($ENV:TMP)\$($environmentShort)-$($tfFolderName)-terraform-output"
         }
         if (!$(Test-Path $artifactPath)) {
             New-Item -Path $artifactPath -ItemType Directory | Out-Null
