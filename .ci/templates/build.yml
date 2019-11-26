@@ -17,7 +17,7 @@ jobs:
       azureSubscription: '${{ parameters.azureSubscription }}'
       addSpnToEnvironment: true
       scriptLocation: inlineScript
-      inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -build -tfVersion $(tfVersion) -environmentShort ${{ parameters.environment }} -artifactPath '$(Build.ArtifactStagingDirectory)'"
+      inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -tfFolderName `"$(tfFolderName)`" -azureDevOps -build -tfVersion $(tfVersion) -environmentShort ${{ parameters.environment }} -artifactPath '$(Build.ArtifactStagingDirectory)'"
   
   - task: PublishPipelineArtifact@0
     displayName: 'Publish artifact'

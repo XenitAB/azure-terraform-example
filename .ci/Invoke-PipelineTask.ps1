@@ -3,9 +3,9 @@
     Script to use Terraform locally and in Azure DevOps
 .DESCRIPTION
     Build:
-        Invoke-PipelineTask.ps1 -build
+        Invoke-PipelineTask.ps1 -tfFolderName tf-core-infra -build
     Deploy:
-        Invoke-PipelineTask.ps1 -deploy
+        Invoke-PipelineTask.ps1 -tfFolderName tf-core-infra -deploy
 .NOTES
     Name: Invoke-PipelineTask.ps1
     Author: Simon Gottschlag
@@ -27,8 +27,11 @@ Param(
     [Parameter(Mandatory = $false, ParameterSetName = 'build')]
     [Parameter(Mandatory = $false, ParameterSetName = 'deploy')]
     [switch]$azureDevOps,
+    [Parameter(Mandatory = $true, ParameterSetName = 'build')]
+    [Parameter(Mandatory = $true, ParameterSetName = 'deploy')]
+    [string]$tfFolderName,
     [string]$tfVersion = "0.12.16",
-    [string]$tfPath = "$($PSScriptRoot)/../terraform/",
+    [string]$tfPath = "$($PSScriptRoot)/../$($tfFolderName)/",
     [string]$environmentShort = "dev",
     [string]$artifactPath,
     [bool]$createStorageAccount = $true,
