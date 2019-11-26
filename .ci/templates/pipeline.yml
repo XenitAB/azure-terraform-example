@@ -1,21 +1,21 @@
 stages:
 - stage: Build
   jobs:
-  - template: .ci/templates/build.yml
+  - template: build.yml
     parameters:
       jobName: Build_dev
       vmImage: $(vmImage)
       environment: dev
       azureSubscription: $(azureSubscription)
 
-  - template: .ci/templates/build.yml
+  - template: build.yml
     parameters:
       jobName: Build_qa
       vmImage: $(vmImage)
       environment: qa
       azureSubscription: $(azureSubscription)
       
-  - template: .ci/templates/build.yml
+  - template: build.yml
     parameters:
       jobName: Build_prod
       vmImage: $(vmImage)
@@ -25,7 +25,7 @@ stages:
 - stage: Deploy_dev
   dependsOn: [Build]
   jobs:
-  - template: .ci/templates/deploy.yml
+  - template: deploy.yml
     parameters:
       deployment: Deploy_dev
       vmImage: $(vmImage)
@@ -35,7 +35,7 @@ stages:
 - stage: Deploy_qa
   dependsOn: [Build, Deploy_dev]
   jobs:
-  - template: .ci/templates/deploy.yml
+  - template: deploy.yml
     parameters:
       deployment: Deploy_qa
       vmImage: $(vmImage)
@@ -45,7 +45,7 @@ stages:
 - stage: Deploy_prod
   dependsOn: [Build, Deploy_qa]
   jobs:
-  - template: .ci/templates/deploy.yml
+  - template: deploy.yml
     parameters:
       deployment: Deploy_prod
       vmImage: $(vmImage)
