@@ -40,3 +40,6 @@ pwsh .ci/Invoke-PipelineTask.ps1 -tfFolderName tf-core-infra -deploy
 
 ### Azure DevOps
 The recommended way of running it, since all the configuration required is included. Add the service connection and modify the variable variables to reflect your environment, see `.ci/pipeline-tf-infra-core.yml` for an example.
+
+### Configuring Azure AD permissions
+If you are trying out `tf-governance` and get permission denied in the pipeline, make sure you add `Directory.ReadWrite.All` and `Application.ReadWrite.All` to the `Azure Active Directory Graph` API (it's under the `Supported legacy APIs` section). You also need to grant admin consent to these permissions.
