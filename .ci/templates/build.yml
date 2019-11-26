@@ -1,6 +1,6 @@
 parameters:
   jobName: ""
-  pool: ""
+  vmImage: ""
   environment: ""
   azureSubscription: ""
 
@@ -8,7 +8,7 @@ jobs:
 - job: ${{ parameters.jobName }}
   displayName: Build ${{ parameters.environment }}
   pool:
-    vmImage: ${{ parameters.pool }}
+    vmImage: ${{ parameters.vmImage }}
   continueOnError: false
   steps:      
   - task: AzureCLI@1

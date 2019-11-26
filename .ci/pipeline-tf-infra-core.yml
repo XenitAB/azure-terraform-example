@@ -1,0 +1,19 @@
+variables:
+  azureSubscription: 'azureRm'
+  tfVersion: "0.12.16"
+  vmImage: 'ubuntu-latest'
+  tfFolderName: 'tf-core-infra'
+
+name: $(Build.BuildId)
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - tf-core-infra
+
+stages:
+  - template: templates/pipeline.yml

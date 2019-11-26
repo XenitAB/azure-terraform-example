@@ -1,6 +1,6 @@
 parameters:
   deployment: ""
-  pool: ""
+  vmImage: ""
   environment: ""
   azureSubscription: ""
 
@@ -8,7 +8,7 @@ jobs:
 - deployment: ${{ parameters.deployment }}
   displayName: Deploy to ${{ parameters.environment }}
   pool:
-    vmImage: ${{ parameters.pool }}
+    vmImage: ${{ parameters.vmImage }}
   continueOnError: false
   environment: ${{ parameters.environment }}
   strategy: 

@@ -1,35 +1,24 @@
-variables:
-  azureSubscription: "azureRm"
-  tfVersion: "0.12.16"
-  pool: 'ubuntu-latest'
-  tfFolderName: 'tf-core-infra'
-
-name: $(Build.BuildId)
-
-trigger:
-- master
-
 stages:
 - stage: Build
   jobs:
   - template: .ci/templates/build.yml
     parameters:
       jobName: Build_dev
-      pool: $(pool)
+      vmImage: $(vmImage)
       environment: dev
       azureSubscription: $(azureSubscription)
 
   - template: .ci/templates/build.yml
     parameters:
       jobName: Build_qa
-      pool: $(pool)
+      vmImage: $(vmImage)
       environment: qa
       azureSubscription: $(azureSubscription)
       
   - template: .ci/templates/build.yml
     parameters:
       jobName: Build_prod
-      pool: $(pool)
+      vmImage: $(vmImage)
       environment: prod
       azureSubscription: $(azureSubscription)
       
@@ -39,7 +28,7 @@ stages:
   - template: .ci/templates/deploy.yml
     parameters:
       deployment: Deploy_dev
-      pool: $(pool)
+      vmImage: $(vmImage)
       environment: dev
       azureSubscription: $(azureSubscription)
 
@@ -49,7 +38,7 @@ stages:
   - template: .ci/templates/deploy.yml
     parameters:
       deployment: Deploy_qa
-      pool: $(pool)
+      vmImage: $(vmImage)
       environment: qa
       azureSubscription: $(azureSubscription)
 
@@ -59,6 +48,6 @@ stages:
   - template: .ci/templates/deploy.yml
     parameters:
       deployment: Deploy_prod
-      pool: $(pool)
+      vmImage: $(vmImage)
       environment: prod
       azureSubscription: $(azureSubscription)
