@@ -19,8 +19,8 @@ jobs:
       scriptLocation: inlineScript
       inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -build -tfVersion $(tfVersion) -environmentShort ${{ parameters.environment }} -artifactPath '$(Build.ArtifactStagingDirectory)'"
   
-  - task: PublishBuildArtifacts@1
+  - task: PublishPipelineArtifact@0
     displayName: 'Publish artifact'
     inputs:
-      pathToPublish: $(Build.ArtifactStagingDirectory)
+      targetPath: $(Build.ArtifactStagingDirectory)
       artifactName: '${{ parameters.environment }}'
