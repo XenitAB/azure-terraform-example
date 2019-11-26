@@ -18,13 +18,11 @@ jobs:
         - checkout: self
           displayName: Get sources
 
-        - task: DownloadBuildArtifacts@0
+        - task: DownloadPipelineArtifact@2
           displayName: 'Download artifact'
           inputs:
-            buildType: 'current'
-            downloadType: 'single'
-            artifactName: '${{ parameters.environment }}'
-            downloadPath: '$(System.ArtifactsDirectory)'
+            artifact: '${{ parameters.environment }}'
+            artifact: '$(System.ArtifactsDirectory)'
             
         - task: AzureCLI@1
           displayName: 'Deploy task'
