@@ -17,6 +17,14 @@ jobs:
         steps:
         - checkout: self
           displayName: Get sources
+
+        - task: DownloadBuildArtifacts@0
+          displayName: 'Download artifact'
+          inputs:
+            buildType: 'current'
+            downloadType: 'single'
+            artifactName: '${{ parameters.environment }}'
+            downloadPath: '$(System.ArtifactsDirectory)'
             
         - task: AzureCLI@1
           displayName: 'Deploy task'
@@ -24,4 +32,4 @@ jobs:
             azureSubscription: '${{ parameters.azureSubscription }}'
             addSpnToEnvironment: true
             scriptLocation: inlineScript
-            inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -deploy -tfVersion $(tfVersion) -environmentShort ${{ parameters.environment }}"
+            inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -deploy -tfVersion $(tfVersion) -environmentShort ${{ parameters.environment }} -artifactPath \"$(System.ArtifactsDirectory)\"""

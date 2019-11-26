@@ -17,12 +17,14 @@ stages:
       pool: $(pool)
       environment: dev
       azureSubscription: $(azureSubscription)
+
   - template: .ci/templates/build.yml
     parameters:
       jobName: Build_qa
       pool: $(pool)
       environment: qa
       azureSubscription: $(azureSubscription)
+      
   - template: .ci/templates/build.yml
     parameters:
       jobName: Build_prod

@@ -29,7 +29,8 @@ Param(
     [switch]$azureDevOps,
     [string]$tfVersion = "0.12.16",
     [string]$tfPath = "$($PSScriptRoot)/../terraform/",
-    [string]$environmentShort = "dev"
+    [string]$environmentShort = "dev",
+    [string]$artifactPath
 )
 
 Begin {
@@ -81,7 +82,23 @@ Begin {
 Process {
     Set-Location -Path $tfPath -ErrorAction Stop
     $tfStateKey = "$($environmentShort).terraform.tfstate"
-    
+
+    if(!$($artifactPath)) {
+        if (!($ENV:IsWindows) -or $($ENV:IsWindows) -eq $false) {
+            $artifactPath = "/tmp/$($environmentShort)-terraform-output"
+        } else {
+            $artifactPath = "$($ENV:TMP)\$($environmentShort)-terraform-output"
+        }
+        if (!$(Test-Path $artifactPath)) {
+            New-Item -Path $artifactPath -ItemType Directory | Out-Null
+            Log-Message -message "INFO: artifactPath ($($artifactPath)) created."
+        } else {
+            Log-Message -message "INFO: artifactPath ($($artifactPath)) already exists."
+        }
+    }
+
+    $tfPlanFile = "$($artifactPath)/$($environmentShort).tfplan"
+
     if ($azureDevOps) {
         Log-Message -message "INFO: Running Azure DevOps specific configuration"
         # Download and extract Terraform
@@ -127,13 +144,13 @@ Process {
                 Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
                 Log-Message -message "END: terraform init"
 
-                Log-Message -message "START: terraform plan"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin plan -input=false -var-file=`"variables/$($environmentShort).tfvars`""))
-                Log-Message -message "END: terraform plan"
-
                 Log-Message -message "START: terraform validate"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin validate"))
                 Log-Message -message "END: terraform validate"
+
+                Log-Message -message "START: terraform plan"
+                Invoke-Call ([ScriptBlock]::Create("$tfBin plan -input=false -var-file=`"variables/$($environmentShort).tfvars`" -out=`"$($tfPlanFile)`""))
+                Log-Message -message "END: terraform plan"
             } catch {
                 $ErrorMessage = $_.Exception.Message
                 $FailedItem = $_.Exception.ItemName
@@ -158,8 +175,9 @@ Process {
                 Log-Message -message "END: terraform init"
 
                 Log-Message -message "START: terraform apply"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin apply -input=false -auto-approve -var-file=`"variables/$($environmentShort).tfvars`""))
-                Log-Message -message "END: terraform init"
+                Invoke-Call ([ScriptBlock]::Create("$tfBin apply -input=false -auto-approve `"$($tfPlanFile)`""))
+                #Invoke-Call ([ScriptBlock]::Create("$tfBin apply -input=false -auto-approve `"$($tfPlanFile)`""))
+                Log-Message -message "END: terraform apply"
             } catch {
                 $ErrorMessage = $_.Exception.Message
                 $FailedItem = $_.Exception.ItemName
