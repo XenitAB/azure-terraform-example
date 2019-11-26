@@ -22,7 +22,7 @@ jobs:
           displayName: 'Download artifact'
           inputs:
             artifact: '${{ parameters.environment }}'
-            artifact: '$(System.ArtifactsDirectory)'
+            path: '$(System.ArtifactsDirectory)'
             
         - task: AzureCLI@1
           displayName: 'Deploy task'
