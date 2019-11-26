@@ -32,4 +32,4 @@ jobs:
             azureSubscription: '${{ parameters.azureSubscription }}'
             addSpnToEnvironment: true
             scriptLocation: inlineScript
-            inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -deploy -tfVersion $(tfVersion) -environmentShort ${{ parameters.environment }} -artifactPath \"$(System.ArtifactsDirectory)\"""
+            inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -azureDevOps -deploy -tfVersion $(tfVersion) -environmentShort ${{ parameters.environment }} -artifactPath '$(System.ArtifactsDirectory)'"
