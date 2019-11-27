@@ -14,5 +14,12 @@ rgConfig = [
             "tag1" = "test1",
             "tag2" = "test2"
         }
-    }
+    },
+    {
+        commonName = "tflab",
+        tags = {
+            "tag1" = "test1",
+            "tag2" = "test2"
+        }
+    },
 ]
