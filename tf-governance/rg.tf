@@ -1,7 +1,7 @@
 resource "azurerm_resource_group" "rg" {
-  count     = length(var.rgConfig)
-  name      = "rg-${var.environmentShort}-${var.locationShort}-${var.rgConfig[count.index].commonName}"
+  for_each  = {for rg in var.rgConfig: rg.commonName => rg}
+  name      = "rg-${var.environmentShort}-${var.locationShort}-${each.value.commonName}"
   location  = var.location
 
-  tags = var.rgConfig[count.index].tags
+  tags = each.value.tags
 }

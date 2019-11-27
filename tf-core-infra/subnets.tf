@@ -1,9 +1,9 @@
 resource "azurerm_subnet" "subnet" {
-  count                       = length(var.vnetConfig.subnets)
-  name                        = "sn-${var.environmentShort}-${var.locationShort}-${var.commonName}-${var.vnetConfig.subnets[count.index].name}"
+  for_each                    = {for subnet in var.vnetConfig.subnets: subnet.name => subnet}
+  name                        = "sn-${var.environmentShort}-${var.locationShort}-${var.commonName}-${each.value.name}"
   resource_group_name         = data.azurerm_resource_group.rg.name
   virtual_network_name        = azurerm_virtual_network.vnet.name
-  address_prefix              = var.vnetConfig.subnets[count.index].cidr
+  address_prefix              = each.value.cidr
 }
 
 resource "azurerm_subnet" "gwSubnet" {
