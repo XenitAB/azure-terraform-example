@@ -42,7 +42,7 @@ pwsh .ci/Invoke-PipelineTask.ps1 -tfFolderName tf-core-infra -deploy
 The recommended way of running it, since all the configuration required is included. Add the service connection and modify the variable variables to reflect your environment, see `.ci/pipeline-tf-infra-core.yml` for an example.
 
 ### Configuring Azure AD permissions
-If you are trying out `tf-governance` and get permission denied in the pipeline, make sure you add `Directory.ReadWrite.All` and `Application.ReadWrite.All` to your service principal for the `Azure Active Directory Graph` API (it's under the `Supported legacy APIs` section). You also need to grant admin consent to these permissions.
+If you are trying out `tf-governance` and get permission denied in the pipeline, make sure you add `Directory.ReadWrite.All` and `Application.ReadWrite.All` to your service principal for the `Azure Active Directory Graph` API (it's under the `Supported legacy APIs` section). You also need to grant admin consent to these permissions. The service principal also need the `Owner` role on the subscription it is running.
 
 ## Boilerplate
 If you want to create a new terraform setup, copy the `tf-boilerplate` folder and `.ci/pipeline-tf-boilerplate.yml` (with your new names). Make sure to update the pipeline yaml where it says boilerplate to your new setup.
