@@ -1,7 +1,3 @@
-location = "West Europe"
-locationShort = "we"
-environmentShort = "prod"
-commonName = "tflab"
 vnetConfig = {
     addressSpace = [ "10.102.0.0/16" ]
     subnets = [

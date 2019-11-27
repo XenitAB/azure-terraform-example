@@ -183,7 +183,7 @@ Process {
                 Log-Message -message "END: terraform validate"
 
                 Log-Message -message "START: terraform plan"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin plan -input=false -var-file=`"variables/$($environmentShort).tfvars`" -out=`"$($tfPlanFile)`""))
+                Invoke-Call ([ScriptBlock]::Create("$tfBin plan -input=false -var-file=`"variables/$($environmentShort).tfvars`" -var-file=`"variables/common.tfvars`" -out=`"$($tfPlanFile)`""))
                 Log-Message -message "END: terraform plan"
             } catch {
                 $ErrorMessage = $_.Exception.Message
