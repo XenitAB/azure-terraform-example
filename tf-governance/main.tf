@@ -9,13 +9,5 @@ provider "azurerm" {
 }
 
 provider "azuread" {
-  version = "=0.3.1"
+  version = "=0.7.0"
 }
-
-# data "azuread_user" "usr" {
-#   user_principal_name = "sgtest@linuslindstromxenit.onmicrosoft.com"
-# }
-
-# output "test" {
-#   value = data.azuread_user.usr
-# }
