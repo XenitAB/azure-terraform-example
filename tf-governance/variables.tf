@@ -12,3 +12,13 @@ variable "environmentShort" {
   description = "The environment (short name) to use for the deploy"
   type = string
 }
+
+variable "rgConfig" {
+  description = "Resource group configuration"
+  type = list(
+    object({
+      commonName = string
+      tags = map(string)
+  })
+  )
+}

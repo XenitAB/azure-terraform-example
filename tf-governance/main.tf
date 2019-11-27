@@ -12,10 +12,10 @@ provider "azuread" {
   version = "=0.3.1"
 }
 
-data "azuread_user" "usr" {
-  user_principal_name = "sgtest@linuslindstromxenit.onmicrosoft.com"
-}
+# data "azuread_user" "usr" {
+#   user_principal_name = "sgtest@linuslindstromxenit.onmicrosoft.com"
+# }
 
-output "test" {
-  value = data.azuread_user.usr
-}
+# output "test" {
+#   value = data.azuread_user.usr
+# }
