@@ -1,6 +1,30 @@
 # azure-terraform-example
 Terraform example to have a short developer loop and pipeline in Azure DevOps (CI/CD).
 
+# Purpose
+## Why was this created?
+We think Infrastructure as Code should be used by everyone while at the same time being as easy and accessible as possible.
+This was created to kick-start indiviruals, teams and organizations and give them an example of how they can work.
+
+## What can I do with this?
+As of writing, we have created two terraform setups. One for the core infrastructure (`tf-core-infra`) and one for governance (`tf-governance`) - as well as Azure Pipelines YAMLs for each. There's also a boilerplate (`tf-boilerplate` and `.ci/pipeline-tf-boilerplate.yml`) which hopefully makes it easier for more setups.
+
+### Governance (`tf-governance`)
+Will create the following resources:
+* Resource Group per common name (`rg.tf`)
+* Azure AD groups and association to the Resource Groups (`aadgroup.tf`)
+* Service Principals and association to the Resource Groups (`rg.tf`)
+
+### Core infrastructure (`tf-core-infra`)
+Will create the following resources (per environment):
+* Virtual Network (`vnet.tf`)
+* Subnets in the Virtual Network (`subnets.tf`)
+* Network Security Groups and attach them to the subnets (`nsg.tf`)
+* KeyVault (`keyVault.tf`)
+
+### Additional information?
+Take a look in the `variables` folder for more information. The `common.tfvars` is used by all environments.
+
 # Before using
 ## Create an Azure connection
 Go to (in Azure DevOps) Project Settings > Service connections > New service connection > Azure Resource Manager > Name will be used as `azureSubscription` in the pipeline yaml (`.ci/pipeline-tf-infra-core` as an example.)
