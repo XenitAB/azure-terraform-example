@@ -4,7 +4,7 @@ Terraform example to have a short developer loop and pipeline in Azure DevOps (C
 # Purpose
 ## Why was this created?
 We think Infrastructure as Code should be used by everyone while at the same time being as easy and accessible as possible.
-This was created to kick-start indiviruals, teams and organizations and give them an example of how they can work.
+This was created to kick-start individuals, teams and organizations and give them an example of how they can work.
 
 ## What can I do with this?
 As of writing, we have created two terraform setups. One for the core infrastructure (`tf-core-infra`) and one for governance (`tf-governance`) - as well as Azure Pipelines YAMLs for each. There's also a boilerplate (`tf-boilerplate` and `.ci/pipeline-tf-boilerplate.yml`) which hopefully makes it easier for more setups.
@@ -24,6 +24,8 @@ Will create the following resources (per environment):
 
 ### Additional information?
 Take a look in the `variables` folder for more information. The `common.tfvars` is used by all environments.
+
+Fork this repository, try it out with Azure Pipelines and make it yours. If you do something cool, you can always do a pull request back here.
 
 # Before using
 ## Create an Azure connection
