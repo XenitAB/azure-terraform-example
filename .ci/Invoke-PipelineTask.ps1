@@ -112,7 +112,8 @@ Begin {
     }
 
     $tfPlanFile = "$($artifactPath)/$($environmentShort).tfplan"
-    $opensslVersion = [version](Invoke-Call ([ScriptBlock]::Create("$opensslBin version")) -split " ")[1]
+    $opensslVersionRaw=Invoke-Call ([ScriptBlock]::Create("$opensslBin version")) -split " "
+    $opensslVersion = [version]($opensslVersionRaw -split " ")[1]
 }
 Process {
     Set-Location -Path $tfPath -ErrorAction Stop
@@ -199,6 +200,7 @@ Process {
                 if ($tfPlanEncryption) {
                     Log-Message -message "START: Encrypt terraform plan"
                     if ($opensslVersion -ge [version]"1.1.1") {
+                        echo test
                         Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000 -a -salt -in `"$($tfPlanFile)`" -out `"$($tfPlanFile).enc`" -k `"$($tfEncPassword)`""))
                     } else {
                         Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -a -salt -in `"$($tfPlanFile)`" -out `"$($tfPlanFile).enc`" -k `"$($tfEncPassword)`""))
