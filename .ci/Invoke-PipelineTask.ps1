@@ -48,14 +48,6 @@ Param(
 Begin {
     $ErrorActionPreference = "Stop"
 
-    if ($tfEncPassword -or $ENV:tfEncPassword) {
-        $tfPlanEncryption = $true
-        $opensslBin = $(Get-Command openssl -ErrorAction Stop)
-        if (!$tfEncPassword) {
-            $tfEncPassword = $ENV:tfEncPassword
-        }
-    }
-
     # Function to retrun error code correctly from binaries
     function Invoke-Call {
         param (
@@ -112,9 +104,17 @@ Begin {
     }
 
     $tfPlanFile = "$($artifactPath)/$($environmentShort).tfplan"
-    $opensslVersionRaw=Invoke-Call ([ScriptBlock]::Create("$opensslBin version")) -split " "
-    $opensslVersionRaw = ($opensslVersionRaw -split " ")[1] -replace "[^0-9.]"
-    $opensslVersion = [version]$opensslVersionRaw
+    if ($tfEncPassword -or $ENV:tfEncPassword) {
+        $tfPlanEncryption = $true
+        $opensslBin = $(Get-Command openssl -ErrorAction Stop)
+        if (!$tfEncPassword) {
+            $tfEncPassword = $ENV:tfEncPassword
+        }
+        $opensslVersionRaw=Invoke-Call ([ScriptBlock]::Create("$opensslBin version")) -split " "
+        $opensslVersionRaw = ($opensslVersionRaw -split " ")[1] -replace "[^0-9.]"
+        $opensslVersion = [version]$opensslVersionRaw
+    }
+
 }
 Process {
     Set-Location -Path $tfPath -ErrorAction Stop
@@ -201,7 +201,6 @@ Process {
                 if ($tfPlanEncryption) {
                     Log-Message -message "START: Encrypt terraform plan"
                     if ($opensslVersion -ge [version]"1.1.1") {
-                        echo test
                         Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000 -a -salt -in `"$($tfPlanFile)`" -out `"$($tfPlanFile).enc`" -k `"$($tfEncPassword)`""))
                     } else {
                         Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -a -salt -in `"$($tfPlanFile)`" -out `"$($tfPlanFile).enc`" -k `"$($tfEncPassword)`""))
