@@ -112,7 +112,7 @@ Begin {
     }
 
     $tfPlanFile = "$($artifactPath)/$($environmentShort).tfplan"
-    Invoke-Call ([ScriptBlock]::Create("$opensslBin version"))
+    $opensslVersion = [version](Invoke-Call ([ScriptBlock]::Create("$opensslBin version")) -split " ")[1]
 }
 Process {
     Set-Location -Path $tfPath -ErrorAction Stop
@@ -198,7 +198,11 @@ Process {
 
                 if ($tfPlanEncryption) {
                     Log-Message -message "START: Encrypt terraform plan"
-                    Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000 -a -salt -in `"$($tfPlanFile)`" -out `"$($tfPlanFile).enc`" -k `"$($tfEncPassword)`""))
+                    if ($opensslVersion -ge [version]"1.1.1") {
+                        Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000 -a -salt -in `"$($tfPlanFile)`" -out `"$($tfPlanFile).enc`" -k `"$($tfEncPassword)`""))
+                    } else {
+                        Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -a -salt -in `"$($tfPlanFile)`" -out `"$($tfPlanFile).enc`" -k `"$($tfEncPassword)`""))
+                    }
                     Remove-Item -Force -Path $tfPlanFile | Out-Null
                     Log-Message -message "END: Encrypt terraform plan"
                 }
@@ -228,7 +232,11 @@ Process {
 
                 if ($tfPlanEncryption) {
                     Log-Message -message "START: Decrypt terraform plan"
-                    Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000 -a -d -salt -in `"$($tfPlanFile).enc`" -out `"$($tfPlanFile)`" -k `"$($tfEncPassword)`""))
+                    if ($opensslVersion -ge [version]"1.1.1") {
+                        Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000 -a -d -salt -in `"$($tfPlanFile).enc`" -out `"$($tfPlanFile)`" -k `"$($tfEncPassword)`""))
+                    } else {
+                        Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -a -d -salt -in `"$($tfPlanFile).enc`" -out `"$($tfPlanFile)`" -k `"$($tfEncPassword)`""))
+                    }
                     Log-Message -message "END: Decrypt terraform plan"
                 }
 
