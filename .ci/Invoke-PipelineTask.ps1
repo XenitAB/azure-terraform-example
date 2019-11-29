@@ -54,7 +54,6 @@ Begin {
         if (!$tfEncPassword) {
             $tfEncPassword = $ENV:tfEncPassword
         }
-        Invoke-Call ([ScriptBlock]::Create("$opensslBin version"))
     }
 
     # Function to retrun error code correctly from binaries
@@ -113,6 +112,7 @@ Begin {
     }
 
     $tfPlanFile = "$($artifactPath)/$($environmentShort).tfplan"
+    Invoke-Call ([ScriptBlock]::Create("$opensslBin version"))
 }
 Process {
     Set-Location -Path $tfPath -ErrorAction Stop
