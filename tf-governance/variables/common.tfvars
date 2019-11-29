@@ -21,5 +21,12 @@ rgConfig = [
             "tag1" = "test1",
             "tag2" = "test2"
         }
+    },
+    {
+        commonName = "aks",
+        tags = {
+            "tag1" = "test1",
+            "tag2" = "test2"
+        }
     }
 ]
