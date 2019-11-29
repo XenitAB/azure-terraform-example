@@ -54,6 +54,7 @@ Begin {
         if (!$tfEncPassword) {
             $tfEncPassword = $ENV:tfEncPassword
         }
+        Invoke-Call ([ScriptBlock]::Create("$opensslBin version"))
     }
 
     # Function to retrun error code correctly from binaries
@@ -193,7 +194,6 @@ Process {
 
                 Log-Message -message "START: terraform plan"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin plan -input=false -var-file=`"variables/$($environmentShort).tfvars`" -var-file=`"variables/common.tfvars`" -out=`"$($tfPlanFile)`""))
-                #Invoke-Call ([ScriptBlock]::Create("$tfBin plan -input=false -var-file=`"variables/$($environmentShort).tfvars`" -var-file=`"variables/common.tfvars`""))
                 Log-Message -message "END: terraform plan"
 
                 if ($tfPlanEncryption) {
@@ -234,7 +234,6 @@ Process {
 
                 Log-Message -message "START: terraform apply"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin apply -input=false -auto-approve `"$($tfPlanFile)`""))
-                #Invoke-Call ([ScriptBlock]::Create("$tfBin apply -input=false -auto-approve -var-file=`"variables/$($environmentShort).tfvars`" -var-file=`"variables/common.tfvars`""))
                 Log-Message -message "END: terraform apply"
             } catch {
                 $ErrorMessage = $_.Exception.Message
