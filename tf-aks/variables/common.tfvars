@@ -1,4 +1,11 @@
-location = "West Europe"
+location      = "West Europe"
 locationShort = "we"
-commonName = "aks"
-coreInfraCommonName = "tflab"
+commonName    = "aks"
+k8sNamespaces = [
+  {
+    name = "team1"
+    labels = {
+      "terraform" = "true"
+    }
+  }
+]
