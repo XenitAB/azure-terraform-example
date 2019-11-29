@@ -8,19 +8,19 @@ stages:
       environment: dev
       azureSubscription: $(azureSubscription)
 
-  - template: build.yml
-    parameters:
-      jobName: Build_qa
-      vmImage: $(vmImage)
-      environment: qa
-      azureSubscription: $(azureSubscription)
+  # - template: build.yml
+  #   parameters:
+  #     jobName: Build_qa
+  #     vmImage: $(vmImage)
+  #     environment: qa
+  #     azureSubscription: $(azureSubscription)
       
-  - template: build.yml
-    parameters:
-      jobName: Build_prod
-      vmImage: $(vmImage)
-      environment: prod
-      azureSubscription: $(azureSubscription)
+  # - template: build.yml
+  #   parameters:
+  #     jobName: Build_prod
+  #     vmImage: $(vmImage)
+  #     environment: prod
+  #     azureSubscription: $(azureSubscription)
       
 - stage: Deploy_dev
   dependsOn: [Build]
@@ -32,22 +32,22 @@ stages:
       environment: dev
       azureSubscription: $(azureSubscription)
 
-- stage: Deploy_qa
-  dependsOn: [Build, Deploy_dev]
-  jobs:
-  - template: deploy.yml
-    parameters:
-      deployment: Deploy_qa
-      vmImage: $(vmImage)
-      environment: qa
-      azureSubscription: $(azureSubscription)
+# - stage: Deploy_qa
+#   dependsOn: [Build, Deploy_dev]
+#   jobs:
+#   - template: deploy.yml
+#     parameters:
+#       deployment: Deploy_qa
+#       vmImage: $(vmImage)
+#       environment: qa
+#       azureSubscription: $(azureSubscription)
 
-- stage: Deploy_prod
-  dependsOn: [Build, Deploy_qa]
-  jobs:
-  - template: deploy.yml
-    parameters:
-      deployment: Deploy_prod
-      vmImage: $(vmImage)
-      environment: prod
-      azureSubscription: $(azureSubscription)
+# - stage: Deploy_prod
+#   dependsOn: [Build, Deploy_qa]
+#   jobs:
+#   - template: deploy.yml
+#     parameters:
+#       deployment: Deploy_prod
+#       vmImage: $(vmImage)
+#       environment: prod
+#       azureSubscription: $(azureSubscription)
