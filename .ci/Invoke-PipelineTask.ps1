@@ -32,6 +32,7 @@ Param(
     [string]$tfFolderName,
     [string]$tfVersion = "0.12.16",
     [string]$tfPath = "$($PSScriptRoot)/../$($tfFolderName)/",
+    [string]$tfEncPassword,
     [string]$environmentShort = "dev",
     [string]$artifactPath,
     [bool]$createStorageAccount = $true,
@@ -46,6 +47,14 @@ Param(
 
 Begin {
     $ErrorActionPreference = "Stop"
+
+    if ($tfEncPassword -or $ENV:tfEncPassword) {
+        $tfPlanEncryption = $true
+        $opensslBin = $(Get-Command openssl -ErrorAction Stop)
+        if (!$tfEncPassword) {
+            $tfEncPassword = $ENV:tfEncPassword
+        }
+    }
 
     # Function to retrun error code correctly from binaries
     function Invoke-Call {
@@ -184,7 +193,16 @@ Process {
 
                 Log-Message -message "START: terraform plan"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin plan -input=false -var-file=`"variables/$($environmentShort).tfvars`" -var-file=`"variables/common.tfvars`" -out=`"$($tfPlanFile)`""))
+                #Invoke-Call ([ScriptBlock]::Create("$tfBin plan -input=false -var-file=`"variables/$($environmentShort).tfvars`" -var-file=`"variables/common.tfvars`""))
                 Log-Message -message "END: terraform plan"
+
+                if ($tfPlanEncryption) {
+                    Log-Message -message "START: Encrypt terraform plan"
+                    Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000 -a -salt -in `"$($tfPlanFile)`" -out `"$($tfPlanFile).enc`" -k `"$($tfEncPassword)`""))
+                    Remove-Item -Force -Path $tfPlanFile | Out-Null
+                    Log-Message -message "END: Encrypt terraform plan"
+                }
+
             } catch {
                 $ErrorMessage = $_.Exception.Message
                 $FailedItem = $_.Exception.ItemName
@@ -208,8 +226,15 @@ Process {
                 Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
                 Log-Message -message "END: terraform init"
 
+                if ($tfPlanEncryption) {
+                    Log-Message -message "START: Decrypt terraform plan"
+                    Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000 -a -d -salt -in `"$($tfPlanFile).enc`" -out `"$($tfPlanFile)`" -k `"$($tfEncPassword)`""))
+                    Log-Message -message "END: Decrypt terraform plan"
+                }
+
                 Log-Message -message "START: terraform apply"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin apply -input=false -auto-approve `"$($tfPlanFile)`""))
+                #Invoke-Call ([ScriptBlock]::Create("$tfBin apply -input=false -auto-approve -var-file=`"variables/$($environmentShort).tfvars`" -var-file=`"variables/common.tfvars`""))
                 Log-Message -message "END: terraform apply"
             } catch {
                 $ErrorMessage = $_.Exception.Message
