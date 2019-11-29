@@ -115,8 +115,6 @@ Begin {
     $opensslVersionRaw=Invoke-Call ([ScriptBlock]::Create("$opensslBin version")) -split " "
     $opensslVersionRaw = ($opensslVersionRaw -split " ")[1] -replace "[^0-9.]"
     $opensslVersion = [version]$opensslVersionRaw
-    $opensslVersion
-    exit 0
 }
 Process {
     Set-Location -Path $tfPath -ErrorAction Stop
