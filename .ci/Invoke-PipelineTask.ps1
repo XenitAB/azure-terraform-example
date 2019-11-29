@@ -113,7 +113,10 @@ Begin {
 
     $tfPlanFile = "$($artifactPath)/$($environmentShort).tfplan"
     $opensslVersionRaw=Invoke-Call ([ScriptBlock]::Create("$opensslBin version")) -split " "
-    $opensslVersion = [version]($opensslVersionRaw -split " ")[1]
+    $opensslVersionRaw = ($opensslVersionRaw -split " ")[1] -replace "[^0-9.]"
+    $opensslVersion = [version]$opensslVersionRaw
+    $opensslVersion
+    exit 0
 }
 Process {
     Set-Location -Path $tfPath -ErrorAction Stop
