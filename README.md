@@ -31,6 +31,9 @@ Fork this repository, try it out with Azure Pipelines and make it yours. If you 
 ## Create an Azure connection
 Go to (in Azure DevOps) Project Settings > Service connections > New service connection > Azure Resource Manager > Name will be used as `azureSubscription` in the pipeline yaml (`.ci/pipeline-tf-infra-core` as an example.)
 
+## Create a variable group
+Go to (in Azure DevOps) Pipelines > Library and create the variable group `terraform-encryption` with a variable (should be `secret`) named `terraformEncryptionSecret`. Make sure it's not in clear text - it will be used to encrypt and decrypt the terraform plans stored in artifacts.
+
 ## Modify .ci/Invoke-PipelineTask.ps1 to reflect your environment:
 ```powershell
     [string]$tfBackendKey = "$($environmentShort).terraform.tfstate",
