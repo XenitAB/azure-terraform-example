@@ -1,0 +1,19 @@
+variables:
+  azureSubscription: 'azureRm'
+  tfVersion: "0.12.16"
+  vmImage: 'ubuntu-latest'
+  tfFolderName: 'tf-aks'
+
+name: $(Build.BuildId)
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - tf-aks
+
+stages:
+  - template: templates/pipeline.yml
