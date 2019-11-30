@@ -32,6 +32,7 @@ Param(
     [string]$tfFolderName,
     [string]$tfVersion = "0.12.16",
     [string]$tfPath = "$($PSScriptRoot)/../$($tfFolderName)/",
+    [string]$tfEncPassword,
     [string]$environmentShort = "dev",
     [string]$artifactPath,
     [bool]$createStorageAccount = $true,
@@ -103,6 +104,17 @@ Begin {
     }
 
     $tfPlanFile = "$($artifactPath)/$($environmentShort).tfplan"
+    if ($tfEncPassword -or $ENV:tfEncPassword) {
+        $tfPlanEncryption = $true
+        $opensslBin = $(Get-Command openssl -ErrorAction Stop)
+        if (!$tfEncPassword) {
+            $tfEncPassword = $ENV:tfEncPassword
+        }
+        $opensslVersionRaw=Invoke-Call ([ScriptBlock]::Create("$opensslBin version")) -split " "
+        $opensslVersionRaw = ($opensslVersionRaw -split " ")[1] -replace "[^0-9.]"
+        $opensslVersion = [version]$opensslVersionRaw
+    }
+
 }
 Process {
     Set-Location -Path $tfPath -ErrorAction Stop
@@ -185,6 +197,18 @@ Process {
                 Log-Message -message "START: terraform plan"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin plan -input=false -var-file=`"variables/$($environmentShort).tfvars`" -var-file=`"variables/common.tfvars`" -out=`"$($tfPlanFile)`""))
                 Log-Message -message "END: terraform plan"
+
+                if ($tfPlanEncryption) {
+                    Log-Message -message "START: Encrypt terraform plan"
+                    if ($opensslVersion -ge [version]"1.1.1") {
+                        Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000 -a -salt -in `"$($tfPlanFile)`" -out `"$($tfPlanFile).enc`" -k `"$($tfEncPassword)`""))
+                    } else {
+                        Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -a -salt -in `"$($tfPlanFile)`" -out `"$($tfPlanFile).enc`" -k `"$($tfEncPassword)`""))
+                    }
+                    Remove-Item -Force -Path $tfPlanFile | Out-Null
+                    Log-Message -message "END: Encrypt terraform plan"
+                }
+
             } catch {
                 $ErrorMessage = $_.Exception.Message
                 $FailedItem = $_.Exception.ItemName
@@ -207,6 +231,16 @@ Process {
                 Log-Message -message "INFO: terraform workspace $($environmentShort) selected"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
                 Log-Message -message "END: terraform init"
+
+                if ($tfPlanEncryption) {
+                    Log-Message -message "START: Decrypt terraform plan"
+                    if ($opensslVersion -ge [version]"1.1.1") {
+                        Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000 -a -d -salt -in `"$($tfPlanFile).enc`" -out `"$($tfPlanFile)`" -k `"$($tfEncPassword)`""))
+                    } else {
+                        Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -a -d -salt -in `"$($tfPlanFile).enc`" -out `"$($tfPlanFile)`" -k `"$($tfEncPassword)`""))
+                    }
+                    Log-Message -message "END: Decrypt terraform plan"
+                }
 
                 Log-Message -message "START: terraform apply"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin apply -input=false -auto-approve `"$($tfPlanFile)`""))

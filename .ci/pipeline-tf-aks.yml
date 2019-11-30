@@ -7,7 +7,7 @@ variables:
   - name: vmImage
     value: 'ubuntu-latest'
   - name: tfFolderName
-    value: 'tf-boilerplate'
+    value: 'tf-aks'
 
 name: $(Build.BuildId)
 
@@ -15,10 +15,10 @@ trigger:
   batch: true
   branches:
     include:
-      - master
+      - aks
   paths:
     include:
-      - tf-boilerplate
+      - tf-aks
 
 stages:
   - template: templates/pipeline.yml

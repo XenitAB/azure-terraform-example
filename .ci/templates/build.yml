@@ -18,6 +18,8 @@ jobs:
       addSpnToEnvironment: true
       scriptLocation: inlineScript
       inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -tfFolderName '$(tfFolderName)' -azureDevOps -build -tfVersion $(tfVersion) -environmentShort ${{ parameters.environment }} -artifactPath '$(Build.ArtifactStagingDirectory)'"
+    env:
+      tfEncPassword: $(terraformEncryptionSecret)
   
   - task: PublishPipelineArtifact@0
     displayName: 'Publish artifact'
