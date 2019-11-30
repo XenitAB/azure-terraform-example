@@ -1,13 +1,13 @@
 variables:
   - group: terraform-encryption
   - name: azureSubscription
-    value: 'azureRm'
+    value: "azureRm"
   - name: tfVersion
-    value: '0.12.16'
+    value: "0.12.16"
   - name: vmImage
-    value: 'ubuntu-latest'
+    value: "ubuntu-latest"
   - name: tfFolderName
-    value: 'tf-aks'
+    value: "tf-aks"
 
 name: $(Build.BuildId)
 
@@ -15,7 +15,7 @@ trigger:
   batch: true
   branches:
     include:
-      - aks
+      - master
   paths:
     include:
       - tf-aks
