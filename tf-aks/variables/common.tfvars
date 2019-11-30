@@ -9,3 +9,4 @@ k8sNamespaces = [
     }
   }
 ]
+k8sSaNamespace = "service-accounts"

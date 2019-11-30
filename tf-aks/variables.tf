@@ -27,3 +27,8 @@ variable "k8sNamespaces" {
     })
   )
 }
+
+variable "k8sSaNamespace" {
+  description = "The namespaced used to store service accounts."
+  type        = string
+}

@@ -8,3 +8,12 @@ resource "kubernetes_namespace" "k8sNs" {
     name = each.value.name
   }
 }
+
+resource "kubernetes_namespace" "k8sSaNs" {
+  metadata {
+    labels = {
+      name = var.k8sSaNamespace
+    }
+    name = var.k8sSaNamespace
+  }
+}
