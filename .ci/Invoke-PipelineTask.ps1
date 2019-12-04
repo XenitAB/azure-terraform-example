@@ -24,11 +24,15 @@ Param(
     [switch]$build,
     [Parameter(Mandatory = $true, ParameterSetName = 'deploy')]
     [switch]$deploy,
+    [Parameter(Mandatory = $true, ParameterSetName = 'destroy')]
+    [switch]$destroy,
     [Parameter(Mandatory = $false, ParameterSetName = 'build')]
     [Parameter(Mandatory = $false, ParameterSetName = 'deploy')]
+    [Parameter(Mandatory = $false, ParameterSetName = 'destroy')]
     [switch]$azureDevOps,
     [Parameter(Mandatory = $true, ParameterSetName = 'build')]
     [Parameter(Mandatory = $true, ParameterSetName = 'deploy')]
+    [Parameter(Mandatory = $true, ParameterSetName = 'destroy')]
     [string]$tfFolderName,
     [string]$tfVersion = "0.12.16",
     [string]$tfPath = "$($PSScriptRoot)/../$($tfFolderName)/",
@@ -57,7 +61,8 @@ Begin {
         )
         if ($SilentNoExit) {
             & @ScriptBlock 2>$null
-        } else {
+        }
+        else {
             & @ScriptBlock
 
             if (($lastexitcode -ne 0) -and $ErrorAction -eq "Stop") {
@@ -75,7 +80,8 @@ Begin {
         if ($header) {
             Write-Output ""
             Write-Output "=============================================================================="
-        } else {
+        }
+        else {
             Write-Output ""
             Write-Output "---"
         }
@@ -83,22 +89,25 @@ Begin {
         if ($header) {
             Write-Output "=============================================================================="
             Write-Output ""
-        } else {
+        }
+        else {
             Write-Output "---"
             Write-Output ""
         }
     }
 
-    if(!$($artifactPath)) {
+    if (!$($artifactPath)) {
         if (!($ENV:IsWindows) -or $($ENV:IsWindows) -eq $false) {
             $artifactPath = "/tmp/$($environmentShort)-$($tfFolderName)-terraform-output"
-        } else {
+        }
+        else {
             $artifactPath = "$($ENV:TMP)\$($environmentShort)-$($tfFolderName)-terraform-output"
         }
         if (!$(Test-Path $artifactPath)) {
             New-Item -Path $artifactPath -ItemType Directory | Out-Null
             Log-Message -message "INFO: artifactPath ($($artifactPath)) created."
-        } else {
+        }
+        else {
             Log-Message -message "INFO: artifactPath ($($artifactPath)) already exists."
         }
     }
@@ -110,7 +119,7 @@ Begin {
         if (!$tfEncPassword) {
             $tfEncPassword = $ENV:tfEncPassword
         }
-        $opensslVersionRaw=Invoke-Call ([ScriptBlock]::Create("$opensslBin version")) -split " "
+        $opensslVersionRaw = Invoke-Call ([ScriptBlock]::Create("$opensslBin version")) -split " "
         $opensslVersionRaw = ($opensslVersionRaw -split " ")[1] -replace "[^0-9.]"
         $opensslVersion = [version]$opensslVersionRaw
     }
@@ -145,7 +154,8 @@ Process {
             $createRg = Invoke-Call ([ScriptBlock]::Create("$azBin group create --name `"$($tfBackendResourceGroup)`" --location `"$($tfBackendResourceGroupLocation)`" --output json")) | ConvertFrom-Json
             if ($createRg.properties.provisioningState -eq "Succeeded") {
                 Log-Message -message "INFO: Azure Resource Group $($tfBackendResourceGroup) successfully provisioned in $($tfBackendResourceGroupLocation)."
-            } else {
+            }
+            else {
                 Log-Message -message "ERROR: Azure Resource Group $($tfBackendResourceGroup) failed to provision in $($tfBackendResourceGroupLocation)."
                 exit 1
             }
@@ -153,7 +163,8 @@ Process {
             $createStrg = Invoke-Call ([ScriptBlock]::Create("$azBin storage account create --resource-group `"$($tfBackendResourceGroup)`" --name `"$($tfBackendStorageAccountName)`" --kind `"$($tfBackendStorageAccountKind)`" --output json")) | ConvertFrom-Json
             if ($createStrg.provisioningState -eq "Succeeded") {
                 Log-Message -message "INFO: Azure Storage Account $($tfBackendStorageAccountName) successfully provisioned in resource group $($tfBackendResourceGroup)."
-            } else {
+            }
+            else {
                 Log-Message -message "ERROR: Azure Storage Account $($tfBackendStorageAccountName) failed to provision in resource group $($tfBackendResourceGroup)."
                 exit 1
             }
@@ -161,15 +172,18 @@ Process {
             $createContainer = Invoke-Call ([ScriptBlock]::Create("$azBin storage container create --account-name `"$($tfBackendStorageAccountName)`" --name `"$($tfBackendContainerName)`" --output json")) | ConvertFrom-Json
             if ($createContainer.created -eq $true) {
                 Log-Message -message "INFO: Azure Storage Account Container $($tfBackendContainerName) created in $($tfBackendStorageAccountName)."
-            } else {
+            }
+            else {
                 Log-Message -message "INFO: Azure Storage Account Container $($tfBackendContainerName) already exists in $($tfBackendStorageAccountName)."
             }
         }
 
-    } else {
+    }
+    else {
         try {
             $tfBin = $(Get-Command terraform -ErrorAction Stop)
-        } catch {
+        }
+        catch {
             Write-Error "Terraform isn't installed"
         }
     }
@@ -183,7 +197,8 @@ Process {
                 try {
                     Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($environmentShort)")) -SilentNoExit
                     Log-Message -message "INFO: terraform workspace $($environmentShort) created"
-                } catch {
+                }
+                catch {
                     Log-Message -message "INFO: terraform workspace $($environmentShort) already exists"
                 }
                 Log-Message -message "INFO: terraform workspace $($environmentShort) selected"
@@ -202,14 +217,16 @@ Process {
                     Log-Message -message "START: Encrypt terraform plan"
                     if ($opensslVersion -ge [version]"1.1.1") {
                         Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000 -a -salt -in `"$($tfPlanFile)`" -out `"$($tfPlanFile).enc`" -k `"$($tfEncPassword)`""))
-                    } else {
+                    }
+                    else {
                         Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -a -salt -in `"$($tfPlanFile)`" -out `"$($tfPlanFile).enc`" -k `"$($tfEncPassword)`""))
                     }
                     Remove-Item -Force -Path $tfPlanFile | Out-Null
                     Log-Message -message "END: Encrypt terraform plan"
                 }
 
-            } catch {
+            }
+            catch {
                 $ErrorMessage = $_.Exception.Message
                 $FailedItem = $_.Exception.ItemName
                 Write-Error "Message: $ErrorMessage`r`nItem: $FailedItem"
@@ -225,7 +242,8 @@ Process {
                 try {
                     Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($environmentShort)")) -SilentNoExit
                     Log-Message -message "INFO: terraform workspace $($environmentShort) created"
-                } catch {
+                }
+                catch {
                     Log-Message -message "INFO: terraform workspace $($environmentShort) already exists"
                 }
                 Log-Message -message "INFO: terraform workspace $($environmentShort) selected"
@@ -236,7 +254,8 @@ Process {
                     Log-Message -message "START: Decrypt terraform plan"
                     if ($opensslVersion -ge [version]"1.1.1") {
                         Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000 -a -d -salt -in `"$($tfPlanFile).enc`" -out `"$($tfPlanFile)`" -k `"$($tfEncPassword)`""))
-                    } else {
+                    }
+                    else {
                         Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -md sha512 -a -d -salt -in `"$($tfPlanFile).enc`" -out `"$($tfPlanFile)`" -k `"$($tfEncPassword)`""))
                     }
                     Log-Message -message "END: Decrypt terraform plan"
@@ -245,7 +264,40 @@ Process {
                 Log-Message -message "START: terraform apply"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin apply -input=false -auto-approve `"$($tfPlanFile)`""))
                 Log-Message -message "END: terraform apply"
-            } catch {
+            }
+            catch {
+                $ErrorMessage = $_.Exception.Message
+                $FailedItem = $_.Exception.ItemName
+                Write-Error "Message: $ErrorMessage`r`nItem: $FailedItem"
+                exit 1
+            }
+            Log-Message -message "END: Deploy" -header
+        }
+        'destroy' {
+            Log-Message -message "START: Destroy" -header
+            try {
+                Log-Message -message "START: terraform init"
+                Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfBackendKey)`" -backend-config=`"resource_group_name=$($tfBackendResourceGroup)`" -backend-config=`"storage_account_name=$($tfBackendStorageAccountName)`" -backend-config=`"container_name=$($tfBackendContainerName)`""))
+                try {
+                    Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($environmentShort)")) -SilentNoExit
+                    Log-Message -message "INFO: terraform workspace $($environmentShort) created"
+                }
+                catch {
+                    Log-Message -message "INFO: terraform workspace $($environmentShort) already exists"
+                }
+                Log-Message -message "INFO: terraform workspace $($environmentShort) selected"
+                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
+                Log-Message -message "END: terraform init"
+
+                Log-Message -message "START: terraform destroy"
+                Log-Message -message "INFO: Manual input required"
+                $destroyConfirmation = Read-Host -Prompt "Continue and destroy $($tfFolderName) (environment: $($environmentShort))? [y/n]"
+                if ( $destroyConfirmation -match "[yY]" ) { 
+                    Invoke-Call ([ScriptBlock]::Create("$tfBin destroy -var-file=`"variables/$($environmentShort).tfvars`" -var-file=`"variables/common.tfvars`""))
+                }
+                Log-Message -message "END: terraform destroy"
+            }
+            catch {
                 $ErrorMessage = $_.Exception.Message
                 $FailedItem = $_.Exception.ItemName
                 Write-Error "Message: $ErrorMessage`r`nItem: $FailedItem"
