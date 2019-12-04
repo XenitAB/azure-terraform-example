@@ -2,8 +2,18 @@ locals {
   vmBaseName = "vm-${var.environmentShort}-${var.locationShort}-${var.commonName}"
 }
 
-data "azurerm_key_vault_secret" "vmPassword" {
+resource "random_password" "vmPassword" {
+  length  = 16
+  special = true
+
+  keepers = {
+    vmPassword = var.commonName
+  }
+}
+
+resource "azurerm_key_vault_secret" "vmPassword" {
   name         = local.vmBaseName
+  value        = random_password.vmPassword.result
   key_vault_id = data.azurerm_key_vault.kv.id
 }
 
@@ -48,7 +58,7 @@ resource "azurerm_virtual_machine" "vm" {
   os_profile {
     computer_name  = "${local.vmBaseName}-${format("%02s", count.index + 1)}"
     admin_username = var.vmConfig.username
-    admin_password = data.azurerm_key_vault_secret.vmPassword.value
+    admin_password = random_password.vmPassword.result
   }
 
   os_profile_linux_config {
