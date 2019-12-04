@@ -11,5 +11,5 @@ resource "azurerm_container_registry" "acr" {
 resource "azurerm_role_assignment" "roleAssignmentAcrPull" {
   scope                = "${data.azurerm_subscription.current.id}/resourceGroups/${data.azurerm_resource_group.rg.name}"
   role_definition_name = "AcrPull"
-  principal_id         = azuread_service_principal.aksSp.id
+  principal_id         = azuread_service_principal.aadAppAksClient.id
 }

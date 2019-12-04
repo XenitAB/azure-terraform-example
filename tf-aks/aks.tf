@@ -25,8 +25,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   service_principal {
-    client_id     = azuread_application.aksSp.application_id
-    client_secret = azuread_service_principal_password.aksSp.value
+    client_id     = azuread_application.aadAppAksClient.application_id
+    client_secret = azuread_service_principal_password.aadAppAksClient.value
   }
 
   role_based_access_control {
