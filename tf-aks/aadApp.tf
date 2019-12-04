@@ -53,7 +53,7 @@ resource "azuread_service_principal" "aadAppAksServer" {
 
 resource "azuread_service_principal_password" "aadAppAksServer" {
   service_principal_id = azuread_service_principal.aadAppAksServer.id
-  value                = random_string.application_server_password.result
+  value                = random_password.application_server_password.result
   end_date             = timeadd(timestamp(), "87600h") # 10 years
 
   # The end date will change at each run (terraform apply), causing a new password to 
@@ -68,7 +68,7 @@ resource "azuread_service_principal_password" "aadAppAksServer" {
   }
 }
 
-resource "random_string" "application_server_password" {
+resource "random_password" "application_server_password" {
   length  = 16
   special = true
 
@@ -112,7 +112,7 @@ resource "azuread_service_principal" "aadAppAksClient" {
 
 resource "azuread_service_principal_password" "aadAppAksClient" {
   service_principal_id = azuread_service_principal.aadAppAksClient.id
-  value                = random_string.application_client_password.result
+  value                = random_password.application_client_password.result
   end_date             = timeadd(timestamp(), "87600h") # 10 years
 
   lifecycle {
@@ -122,7 +122,7 @@ resource "azuread_service_principal_password" "aadAppAksClient" {
   }
 }
 
-resource "random_string" "application_client_password" {
+resource "random_password" "application_client_password" {
   length  = 16
   special = true
 
