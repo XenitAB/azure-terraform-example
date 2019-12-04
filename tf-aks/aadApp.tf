@@ -69,8 +69,9 @@ resource "azuread_service_principal_password" "aadAppAksServer" {
 }
 
 resource "random_password" "application_server_password" {
-  length  = 16
-  special = true
+  length           = 16
+  special          = true
+  override_special = "!-_="
 
   keepers = {
     service_principal = azuread_service_principal.aadAppAksServer.id
@@ -123,8 +124,9 @@ resource "azuread_service_principal_password" "aadAppAksClient" {
 }
 
 resource "random_password" "application_client_password" {
-  length  = 16
-  special = true
+  length           = 16
+  special          = true
+  override_special = "!-_="
 
   keepers = {
     service_principal = azuread_service_principal.aadAppAksClient.id
