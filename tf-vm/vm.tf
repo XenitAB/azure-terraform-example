@@ -41,6 +41,10 @@ resource "azurerm_virtual_machine" "vm" {
     azurerm_network_interface.nic[count.index].id
   ]
 
+  zones = [
+    ((count.index % var.locationZoneCount) + 1)
+  ]
+
   storage_image_reference {
     publisher = var.vmConfig.storageImageReference.publisher
     offer     = var.vmConfig.storageImageReference.offer

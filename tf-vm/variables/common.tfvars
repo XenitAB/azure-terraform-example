@@ -1,6 +1,8 @@
-location      = "West Europe"
-locationShort = "we"
-commonName    = "vm"
+location          = "West Europe"
+locationShort     = "we"
+locationZoneCount = 3
+commonName        = "vm"
+
 coreConfig = {
   commonName = "tflab"
   subnetName = "inside"

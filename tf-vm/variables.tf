@@ -8,6 +8,11 @@ variable "locationShort" {
   type        = string
 }
 
+variable "locationZoneCount" {
+  description = "Number of zones in Azure region."
+  type        = number
+}
+
 variable "environmentShort" {
   description = "The environment (short name) to use for the deploy"
   type        = string
