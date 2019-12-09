@@ -26,14 +26,23 @@ Param(
     [switch]$deploy,
     [Parameter(Mandatory = $true, ParameterSetName = 'destroy')]
     [switch]$destroy,
+    [Parameter(Mandatory = $true, ParameterSetName = 'import')]
+    [switch]$import,
     [Parameter(Mandatory = $false, ParameterSetName = 'build')]
     [Parameter(Mandatory = $false, ParameterSetName = 'deploy')]
     [Parameter(Mandatory = $false, ParameterSetName = 'destroy')]
+    [Parameter(Mandatory = $false, ParameterSetName = 'import')]
     [switch]$azureDevOps,
     [Parameter(Mandatory = $true, ParameterSetName = 'build')]
     [Parameter(Mandatory = $true, ParameterSetName = 'deploy')]
     [Parameter(Mandatory = $true, ParameterSetName = 'destroy')]
+    [Parameter(Mandatory = $true, ParameterSetName = 'import')]
     [string]$tfFolderName,
+    [Parameter(Mandatory = $false, ParameterSetName = 'build')]
+    [Parameter(Mandatory = $false, ParameterSetName = 'deploy')]
+    [Parameter(Mandatory = $false, ParameterSetName = 'destroy')]
+    [Parameter(Mandatory = $true, ParameterSetName = 'import')]
+    [string]$tfImportResource,
     [string]$tfVersion = "0.12.16",
     [string]$tfPath = "$($PSScriptRoot)/../$($tfFolderName)/",
     [string]$tfEncPassword,
@@ -296,6 +305,34 @@ Process {
                     Invoke-Call ([ScriptBlock]::Create("$tfBin destroy -var-file=`"variables/$($environmentShort).tfvars`" -var-file=`"variables/common.tfvars`""))
                 }
                 Log-Message -message "END: terraform destroy"
+            }
+            catch {
+                $ErrorMessage = $_.Exception.Message
+                $FailedItem = $_.Exception.ItemName
+                Write-Error "Message: $ErrorMessage`r`nItem: $FailedItem"
+                exit 1
+            }
+            Log-Message -message "END: Deploy" -header
+        }
+        'import' {
+            Log-Message -message "START: Destroy" -header
+            try {
+                Log-Message -message "START: terraform init"
+                Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfBackendKey)`" -backend-config=`"resource_group_name=$($tfBackendResourceGroup)`" -backend-config=`"storage_account_name=$($tfBackendStorageAccountName)`" -backend-config=`"container_name=$($tfBackendContainerName)`""))
+                try {
+                    Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($environmentShort)")) -SilentNoExit
+                    Log-Message -message "INFO: terraform workspace $($environmentShort) created"
+                }
+                catch {
+                    Log-Message -message "INFO: terraform workspace $($environmentShort) already exists"
+                }
+                Log-Message -message "INFO: terraform workspace $($environmentShort) selected"
+                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
+                Log-Message -message "END: terraform init"
+
+                Log-Message -message "START: terraform import"
+                Invoke-Call ([ScriptBlock]::Create("$tfBin import -var-file=`"variables/$($environmentShort).tfvars`" -var-file=`"variables/common.tfvars`" $($tfImportResource)"))
+                Log-Message -message "END: terraform import"
             }
             catch {
                 $ErrorMessage = $_.Exception.Message
