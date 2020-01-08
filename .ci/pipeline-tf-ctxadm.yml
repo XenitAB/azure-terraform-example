@@ -1,0 +1,24 @@
+variables:
+  - group: terraform-encryption
+  - name: azureSubscription
+    value: "azureRm"
+  - name: tfVersion
+    value: "0.12.16"
+  - name: vmImage
+    value: "ubuntu-latest"
+  - name: tfFolderName
+    value: "tf-ctxadm"
+
+name: $(Build.BuildId)
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - tf-ctxadm
+
+stages:
+  - template: templates/pipeline.yml
