@@ -14,6 +14,7 @@ resource "azurerm_network_interface" "nicInside" {
       subnet_id                     = data.azurerm_subnet.insideSubnet.id
       private_ip_address_allocation = "Static"
       private_ip_address            = ip_configuration.value
+      primary                       = index(var.ipConfiguration[count.index].inside, ip_configuration.value) == 0 ? true : false
     }
   }
 }
@@ -42,6 +43,7 @@ resource "azurerm_network_interface" "nicOutside" {
       subnet_id                     = data.azurerm_subnet.outsideSubnet.id
       private_ip_address_allocation = "Static"
       private_ip_address            = ip_configuration.value
+      primary                       = index(var.ipConfiguration[count.index].outside, ip_configuration.value) == 0 ? true : false
     }
   }
 }
@@ -68,6 +70,7 @@ resource "azurerm_network_interface" "nicManagement" {
       subnet_id                     = data.azurerm_subnet.managementSubnet.id
       private_ip_address_allocation = "Static"
       private_ip_address            = ip_configuration.value
+      primary                       = index(var.ipConfiguration[count.index].management, ip_configuration.value) == 0 ? true : false
     }
   }
 }

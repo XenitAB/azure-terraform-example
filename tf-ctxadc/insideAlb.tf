@@ -12,6 +12,7 @@ resource "azurerm_lb" "insideAzureLb" {
       name                          = "fe-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-inside-${format("%02s", index(var.azureLbConfig.insideIpAddresses, frontend_ip_configuration.value) + 1)}"
       private_ip_address_allocation = "Static"
       private_ip_address            = frontend_ip_configuration.value
+      subnet_id                     = data.azurerm_subnet.insideSubnet.id
     }
   }
 }
@@ -38,7 +39,7 @@ resource "azurerm_lb_rule" "insideAzureLbRule80" {
   loadbalancer_id                = azurerm_lb.insideAzureLb.id
   backend_address_pool_id        = azurerm_lb_backend_address_pool.insideAzureLbBackendPool.id
   enable_floating_ip             = true
-  name                           = "lbr-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-inside-80"
+  name                           = "lbr-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-inside-${format("%02s", index(var.azureLbConfig.insideIpAddresses, each.value) + 1)}-80"
   protocol                       = "Tcp"
   frontend_port                  = 80
   backend_port                   = 80
@@ -53,7 +54,7 @@ resource "azurerm_lb_rule" "insideAzureLbRule443" {
   loadbalancer_id                = azurerm_lb.insideAzureLb.id
   backend_address_pool_id        = azurerm_lb_backend_address_pool.insideAzureLbBackendPool.id
   enable_floating_ip             = true
-  name                           = "lbr-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-inside-443"
+  name                           = "lbr-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-inside-${format("%02s", index(var.azureLbConfig.insideIpAddresses, each.value) + 1)}-443"
   protocol                       = "Tcp"
   frontend_port                  = 443
   backend_port                   = 443

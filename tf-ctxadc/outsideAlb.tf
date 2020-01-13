@@ -33,7 +33,7 @@ resource "azurerm_lb_rule" "outsideAzureLbRule80" {
   loadbalancer_id                = azurerm_lb.outsideAzureLb.id
   backend_address_pool_id        = azurerm_lb_backend_address_pool.outsideAzureLbBackendPool.id
   enable_floating_ip             = true
-  name                           = "lbr-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-outside-80"
+  name                           = "lbr-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-outside-${format("%02s", count.index + 1)}-80"
   protocol                       = "Tcp"
   frontend_port                  = 80
   backend_port                   = 80
@@ -46,7 +46,7 @@ resource "azurerm_lb_rule" "outsideAzureLbRule443" {
   loadbalancer_id                = azurerm_lb.outsideAzureLb.id
   backend_address_pool_id        = azurerm_lb_backend_address_pool.outsideAzureLbBackendPool.id
   enable_floating_ip             = true
-  name                           = "lbr-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-outside-443"
+  name                           = "lbr-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-outside-${format("%02s", count.index + 1)}-443"
   protocol                       = "Tcp"
   frontend_port                  = 443
   backend_port                   = 443

@@ -30,6 +30,7 @@ resource "azurerm_virtual_machine" "vm" {
   resource_group_name = data.azurerm_resource_group.rg.name
   vm_size             = var.vmConfig.size
 
+  primary_network_interface_id = azurerm_network_interface.nicManagement[count.index].id
   network_interface_ids = [
     azurerm_network_interface.nicManagement[count.index].id,
     azurerm_network_interface.nicInside[count.index].id,
