@@ -11,7 +11,7 @@ coreConfig = {
 }
 
 vmConfig = {
-  count    = 1
+  count    = 2
   username = "adcadmin"
   size     = "Standard_DS3_v2"
   publisherConfig = {
