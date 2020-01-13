@@ -35,5 +35,19 @@ rgConfig = [
       "tag1" = "test1",
       "tag2" = "test2"
     }
+  },
+  {
+    commonName = "ctxadm",
+    tags = {
+      "tag1" = "test1",
+      "tag2" = "test2"
+    }
+  },
+  {
+    commonName = "ctxadc",
+    tags = {
+      "tag1" = "test1",
+      "tag2" = "test2"
+    }
   }
 ]
