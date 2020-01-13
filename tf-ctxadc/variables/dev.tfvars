@@ -1,4 +1,12 @@
 environmentShort = "dev"
+azureLbConfig = {
+  pipCount = 3
+  insideIpAddresses = [
+    "10.100.0.104",
+    "10.100.0.105",
+    "10.100.0.106"
+  ]
+}
 ipConfiguration = [
   {
     management = [

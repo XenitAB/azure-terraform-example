@@ -45,7 +45,8 @@ variable "ipConfiguration" {
 variable "azureLbConfig" {
   description = "Configuration for the Azure LB"
   type = object({
-    pipCount = number
+    pipCount          = number
+    insideIpAddresses = list(string)
   })
 }
 

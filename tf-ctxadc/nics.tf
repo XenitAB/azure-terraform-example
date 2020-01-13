@@ -10,12 +10,20 @@ resource "azurerm_network_interface" "nicInside" {
       for ip in var.ipConfiguration[count.index].inside : ip => ip
     }
     content {
-      name                          = "ipconfig-${ip_configuration.value}"
+      name                          = "ipconfig-${index(var.ipConfiguration[count.index].inside, ip_configuration.value)}"
       subnet_id                     = data.azurerm_subnet.insideSubnet.id
       private_ip_address_allocation = "Static"
       private_ip_address            = ip_configuration.value
     }
   }
+}
+
+
+resource "azurerm_network_interface_backend_address_pool_association" "nicInsideBePoolAssociation" {
+  count                   = var.vmConfig.count
+  network_interface_id    = azurerm_network_interface.nicInside[count.index].id
+  ip_configuration_name   = "ipconfig-1"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.insideAzureLbBackendPool.id
 }
 
 resource "azurerm_network_interface" "nicOutside" {
@@ -30,12 +38,19 @@ resource "azurerm_network_interface" "nicOutside" {
       for ip in var.ipConfiguration[count.index].outside : ip => ip
     }
     content {
-      name                          = "ipconfig-${ip_configuration.value}"
+      name                          = "ipconfig-${index(var.ipConfiguration[count.index].outside, ip_configuration.value)}"
       subnet_id                     = data.azurerm_subnet.outsideSubnet.id
       private_ip_address_allocation = "Static"
       private_ip_address            = ip_configuration.value
     }
   }
+}
+
+resource "azurerm_network_interface_backend_address_pool_association" "nicOutsideBePoolAssociation" {
+  count                   = var.vmConfig.count
+  network_interface_id    = azurerm_network_interface.nicOutside[count.index].id
+  ip_configuration_name   = "ipconfig-1"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.outsideAzureLbBackendPool.id
 }
 
 resource "azurerm_network_interface" "nicManagement" {
@@ -49,7 +64,7 @@ resource "azurerm_network_interface" "nicManagement" {
       for ip in var.ipConfiguration[count.index].management : ip => ip
     }
     content {
-      name                          = "ipconfig-${ip_configuration.value}"
+      name                          = "ipconfig-${index(var.ipConfiguration[count.index].management, ip_configuration.value)}"
       subnet_id                     = data.azurerm_subnet.managementSubnet.id
       private_ip_address_allocation = "Static"
       private_ip_address            = ip_configuration.value

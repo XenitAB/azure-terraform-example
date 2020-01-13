@@ -10,10 +10,6 @@ coreConfig = {
   managementSubnetName = "management"
 }
 
-azureLbConfig = {
-  pipCount = 3
-}
-
 vmConfig = {
   count    = 1
   username = "adcadmin"
