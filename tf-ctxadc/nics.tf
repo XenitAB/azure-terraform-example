@@ -23,7 +23,7 @@ resource "azurerm_network_interface" "nicInside" {
 resource "azurerm_network_interface_backend_address_pool_association" "nicInsideBePoolAssociation" {
   count                   = var.vmConfig.count
   network_interface_id    = azurerm_network_interface.nicInside[count.index].id
-  ip_configuration_name   = "ipconfig-1"
+  ip_configuration_name   = "ipconfig-0"
   backend_address_pool_id = azurerm_lb_backend_address_pool.insideAzureLbBackendPool.id
 }
 
@@ -51,7 +51,7 @@ resource "azurerm_network_interface" "nicOutside" {
 resource "azurerm_network_interface_backend_address_pool_association" "nicOutsideBePoolAssociation" {
   count                   = var.vmConfig.count
   network_interface_id    = azurerm_network_interface.nicOutside[count.index].id
-  ip_configuration_name   = "ipconfig-1"
+  ip_configuration_name   = "ipconfig-0"
   backend_address_pool_id = azurerm_lb_backend_address_pool.outsideAzureLbBackendPool.id
 }
 
