@@ -38,6 +38,7 @@ resource "azurerm_lb_rule" "outsideAzureLbRule80" {
   frontend_port                  = 80
   backend_port                   = 80
   frontend_ip_configuration_name = "fe-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-outside-${format("%02s", count.index + 1)}"
+  probe_id                       = azurerm_lb_probe.outsideAzureLbProbe.id
 }
 
 resource "azurerm_lb_rule" "outsideAzureLbRule443" {
@@ -51,4 +52,5 @@ resource "azurerm_lb_rule" "outsideAzureLbRule443" {
   frontend_port                  = 443
   backend_port                   = 443
   frontend_ip_configuration_name = "fe-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-outside-${format("%02s", count.index + 1)}"
+  probe_id                       = azurerm_lb_probe.outsideAzureLbProbe.id
 }

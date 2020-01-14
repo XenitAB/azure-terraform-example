@@ -31,7 +31,7 @@ resource "azurerm_lb_backend_address_pool" "insideAzureLbBackendPool" {
   name                = "be-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-inside"
 }
 
-resource "azurerm_lb_rule" "insideAzureLbRule80" {
+resource "azurerm_lb_rule" "insideAzureLbRule" {
   for_each = {
     for ip in var.azureLbConfig.insideIpAddresses : ip => ip
   }
@@ -39,24 +39,10 @@ resource "azurerm_lb_rule" "insideAzureLbRule80" {
   loadbalancer_id                = azurerm_lb.insideAzureLb.id
   backend_address_pool_id        = azurerm_lb_backend_address_pool.insideAzureLbBackendPool.id
   enable_floating_ip             = true
-  name                           = "lbr-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-inside-${format("%02s", index(var.azureLbConfig.insideIpAddresses, each.value) + 1)}-80"
-  protocol                       = "Tcp"
-  frontend_port                  = 80
-  backend_port                   = 80
+  name                           = "lbr-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-inside-${format("%02s", index(var.azureLbConfig.insideIpAddresses, each.value) + 1)}"
+  protocol                       = "All"
+  frontend_port                  = 0
+  backend_port                   = 0
   frontend_ip_configuration_name = "fe-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-inside-${format("%02s", index(var.azureLbConfig.insideIpAddresses, each.value) + 1)}"
-}
-
-resource "azurerm_lb_rule" "insideAzureLbRule443" {
-  for_each = {
-    for ip in var.azureLbConfig.insideIpAddresses : ip => ip
-  }
-  resource_group_name            = data.azurerm_resource_group.rg.name
-  loadbalancer_id                = azurerm_lb.insideAzureLb.id
-  backend_address_pool_id        = azurerm_lb_backend_address_pool.insideAzureLbBackendPool.id
-  enable_floating_ip             = true
-  name                           = "lbr-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-inside-${format("%02s", index(var.azureLbConfig.insideIpAddresses, each.value) + 1)}-443"
-  protocol                       = "Tcp"
-  frontend_port                  = 443
-  backend_port                   = 443
-  frontend_ip_configuration_name = "fe-alb-${var.environmentShort}-${var.locationShort}-${var.commonName}-inside-${format("%02s", index(var.azureLbConfig.insideIpAddresses, each.value) + 1)}"
+  probe_id                       = azurerm_lb_probe.insideAzureLbProbe.id
 }
