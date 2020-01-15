@@ -1,5 +1,7 @@
 # AKS Readme
 
+This is for AKS without defining an already existing vnet/subnet.
+
 ## First run
 
 It will fail the first time it runs. Let it fail and then go through the below steps and then run it again.
