@@ -5,7 +5,7 @@ terraform {
 
 # Configure the Azure Provider
 provider "azurerm" {
-  version = "=1.37.0"
+  version = "=1.40.0"
 }
 
 # Configure the Azure AD Provider
