@@ -1,19 +1,16 @@
 environmentShort = "qa"
 vnetConfig = {
-    addressSpace = [ "10.101.0.0/16" ]
-    subnets = [
-        {
-            name = "inside"
-            cidr = "10.101.0.0/24"
-        },
-        {
-            name = "outside"
-            cidr = "10.101.1.0/24"
-        },
-        {
-            name = "management"
-            cidr = "10.101.254.0/24"
-        }
-    ]
+  addressSpace = ["10.101.0.0/16"]
+  subnets = [
+    {
+      name      = "aks"
+      cidr      = "10.101.0.0/24"
+      aksSubnet = true
+    },
+    {
+      name      = "servers"
+      cidr      = "10.101.1.0/24"
+      aksSubnet = false
+    }
+  ]
 }
-gatewaySubnet = "10.101.255.0/24"

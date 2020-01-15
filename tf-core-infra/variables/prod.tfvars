@@ -1,19 +1,16 @@
 environmentShort = "prod"
 vnetConfig = {
-    addressSpace = [ "10.102.0.0/16" ]
-    subnets = [
-        {
-            name = "inside"
-            cidr = "10.102.0.0/24"
-        },
-        {
-            name = "outside"
-            cidr = "10.102.1.0/24"
-        },
-        {
-            name = "management"
-            cidr = "10.102.254.0/24"
-        }
-    ]
+  addressSpace = ["10.102.0.0/16"]
+  subnets = [
+    {
+      name      = "aks"
+      cidr      = "10.102.0.0/24"
+      aksSubnet = true
+    },
+    {
+      name      = "servers"
+      cidr      = "10.102.1.0/16"
+      aksSubnet = false
+    }
+  ]
 }
-gatewaySubnet = "10.102.255.0/24"

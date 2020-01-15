@@ -1,21 +1,26 @@
 variable "location" {
   description = "The Azure region to create things in."
-  type = string
+  type        = string
 }
 
 variable "locationShort" {
   description = "The Azure region short name."
-  type = string
+  type        = string
 }
 
 variable "environmentShort" {
   description = "The environment (short name) to use for the deploy"
-  type = string
+  type        = string
+}
+
+variable "groupCommonName" {
+  description = "The groupCommonName to use for the deploy"
+  type        = string
 }
 
 variable "commonName" {
   description = "The commonName to use for the deploy"
-  type = string
+  type        = string
 }
 
 variable "vnetConfig" {
@@ -23,13 +28,9 @@ variable "vnetConfig" {
   type = object({
     addressSpace = list(string)
     subnets = list(object({
-      name = string
-      cidr = string
+      name      = string
+      cidr      = string
+      aksSubnet = bool
     }))
   })
-}
-
-variable "gatewaySubnet" {
-  description = "CIDR for GatewaySubnet"
-  type = string
 }
