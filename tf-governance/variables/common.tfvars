@@ -1,53 +1,42 @@
-location      = "West Europe"
-locationShort = "we"
+location       = "West Europe"
+locationShort  = "we"
+commonName     = "tf"
+coreCommonName = "tflab"
 rgConfig = [
   {
-    commonName = "cntest1",
+    commonName  = "tfstate",
+    delegateAks = false,
     tags = {
-      "tag1" = "test1",
-      "tag2" = "test2"
+      "description" = "State for terraform"
     }
   },
   {
-    commonName = "cntest2",
+    commonName  = "tflab",
+    delegateAks = false,
     tags = {
-      "tag1" = "test1",
-      "tag2" = "test2"
+      "description" = "Core infrastructure"
     }
   },
   {
-    commonName = "tflab",
+    commonName  = "aks",
+    delegateAks = false,
     tags = {
-      "tag1" = "test1",
-      "tag2" = "test2"
+      "description" = "Azure Kubernetes Service (AKS)"
     }
   },
   {
-    commonName = "aks",
+    commonName  = "team1",
+    delegateAks = true,
     tags = {
-      "tag1" = "test1",
-      "tag2" = "test2"
+      "description" = "Team1 resource group"
     }
   },
   {
-    commonName = "vm",
+    commonName  = "ctxadm",
+    delegateAks = false,
     tags = {
-      "tag1" = "test1",
-      "tag2" = "test2"
-    }
-  },
-  {
-    commonName = "ctxadm",
-    tags = {
-      "tag1" = "test1",
-      "tag2" = "test2"
-    }
-  },
-  {
-    commonName = "ctxadc",
-    tags = {
-      "tag1" = "test1",
-      "tag2" = "test2"
+      "techContact" = "Xenit AB",
+      "description" = "Citrix Application Delivery Management"
     }
   }
 ]

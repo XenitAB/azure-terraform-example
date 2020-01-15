@@ -1,7 +1,7 @@
 # AAD Group for Owners
 resource "azuread_group" "aadGroupOwner" {
   for_each = { for rg in var.rgConfig : rg.commonName => rg }
-  name     = "azr-rg-${var.environmentShort}-${each.value.commonName}-owner"
+  name     = "azr-rg-${var.commonName}-${var.environmentShort}-${each.value.commonName}-owner"
 }
 
 resource "azurerm_role_assignment" "roleAssignmentOwner" {
@@ -14,7 +14,7 @@ resource "azurerm_role_assignment" "roleAssignmentOwner" {
 # AAD Group for Contributors
 resource "azuread_group" "aadGroupContributor" {
   for_each = { for rg in var.rgConfig : rg.commonName => rg }
-  name     = "azr-rg-${var.environmentShort}-${each.value.commonName}-contributor"
+  name     = "azr-rg-${var.commonName}-${var.environmentShort}-${each.value.commonName}-contributor"
 }
 
 resource "azurerm_role_assignment" "roleAssignmentContributor" {
@@ -27,7 +27,7 @@ resource "azurerm_role_assignment" "roleAssignmentContributor" {
 # AAD Group for Readers
 resource "azuread_group" "aadGroupReader" {
   for_each = { for rg in var.rgConfig : rg.commonName => rg }
-  name     = "azr-rg-${var.environmentShort}-${each.value.commonName}-reader"
+  name     = "azr-rg-${var.commonName}-${var.environmentShort}-${each.value.commonName}-reader"
 }
 
 resource "azurerm_role_assignment" "roleAssignmentReader" {

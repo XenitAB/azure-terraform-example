@@ -13,12 +13,23 @@ variable "environmentShort" {
   type        = string
 }
 
+variable "commonName" {
+  description = "The commonName to use in names"
+  type        = string
+}
+
+variable "coreCommonName" {
+  description = "The commonName for the core infra"
+  type        = string
+}
+
 variable "rgConfig" {
   description = "Resource group configuration"
   type = list(
     object({
-      commonName = string
-      tags       = map(string)
+      commonName  = string
+      delegateAks = bool
+      tags        = map(string)
     })
   )
 }
