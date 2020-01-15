@@ -1,9 +1,15 @@
 variables:
   - group: terraform-encryption
+  - name: devEnvEnabled
+    value: true
+  - name: qaEnvEnabled
+    value: false
+  - name: prodEnvEnabled
+    value: false
   - name: azureSubscription
     value: 'azureRm'
   - name: tfVersion
-    value: '0.12.16'
+    value: '0.12.19'
   - name: vmImage
     value: 'ubuntu-latest'
   - name: tfFolderName

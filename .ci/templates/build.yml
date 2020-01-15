@@ -6,6 +6,7 @@ parameters:
 
 jobs:
 - job: ${{ parameters.jobName }}
+  condition: and(succeeded(), eq(variables['${{ parameters.environment }}EnvEnabled'], true))
   displayName: Build ${{ parameters.environment }}
   pool:
     vmImage: ${{ parameters.vmImage }}

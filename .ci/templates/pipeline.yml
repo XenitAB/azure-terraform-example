@@ -7,6 +7,7 @@ stages:
       vmImage: $(vmImage)
       environment: dev
       azureSubscription: $(azureSubscription)
+    
 
   - template: build.yml
     parameters:

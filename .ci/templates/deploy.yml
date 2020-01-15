@@ -6,6 +6,7 @@ parameters:
 
 jobs:
 - deployment: ${{ parameters.deployment }}
+  condition: and(succeeded(), eq(variables['${{ parameters.environment }}EnvEnabled'], true))
   displayName: Deploy to ${{ parameters.environment }}
   pool:
     vmImage: ${{ parameters.vmImage }}
