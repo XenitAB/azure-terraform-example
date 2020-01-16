@@ -17,6 +17,16 @@ This will setup the following resources:
 * Kubernetes namespaces
 * Kubernetes service accounts (since service principals can't use Azure AD authentication to AKS)
 
+## Additional resources
+
+### Kubernetes configuration
+
+[ansible-kubernetes-configuration](https://github.com/XenitAB/ansible-kubernetes-configuration)
+
+### Example deployment to cluster
+
+[hello-k8s](https://github.com/XenitAB/hello-k8s)
+
 ## First run
 
 It will fail the first time it runs. Let it fail and then go through the below steps and then run it again.
