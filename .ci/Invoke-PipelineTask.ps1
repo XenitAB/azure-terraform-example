@@ -43,7 +43,7 @@ Param(
     [Parameter(Mandatory = $false, ParameterSetName = 'destroy')]
     [Parameter(Mandatory = $true, ParameterSetName = 'import')]
     [string]$tfImportResource,
-    [string]$tfVersion = "0.12.19",
+    [string]$tfVersion = "0.12.20",
     [string]$tfPath = "$($PSScriptRoot)/../$($tfFolderName)/",
     [string]$tfEncPassword,
     [string]$environmentShort = "dev",
