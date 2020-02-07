@@ -134,6 +134,8 @@ Begin {
 Process {
     Set-Location -Path $tfPath -ErrorAction Stop
 
+    $azBin = $(Get-Command az -ErrorAction Stop)
+
     if ($azureDevOps) {
         Log-Message -message "INFO: Running Azure DevOps specific configuration"
         # Download and extract Terraform
@@ -145,7 +147,6 @@ Process {
         Log-Message -message "INFO: Using Terraform version $($tfVersion) from $($tfBin)"
 
         # Configure environment variables for Terraform
-        $azBin = $(Get-Command az -ErrorAction Stop)
         $Subscriptions = Invoke-Call ([ScriptBlock]::Create("$azBin account list --output json")) | ConvertFrom-Json
         foreach ($Subscription in $Subscriptions) {
             if ($Subscription.isDefault) {
@@ -211,6 +212,10 @@ Process {
                 Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
                 Log-Message -message "END: terraform init"
 
+                Log-Message -message "START: Snapshot terraform state"
+                Invoke-Call ([ScriptBlock]::Create("$azBin storage blob snapshot --account-name `"$($tfBackendStorageAccountName)`" --container-name `"$($tfBackendContainerName)`" --name `"$($tfBackendKey)env:$($environmentShort)`" --output json")) | ConvertFrom-Json
+                Log-Message -message "END: Snapshot terraform state"
+
                 Log-Message -message "START: terraform validate"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin validate"))
                 Log-Message -message "END: terraform validate"
@@ -251,6 +256,10 @@ Process {
                 Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
                 Log-Message -message "END: terraform init"
 
+                Log-Message -message "START: Snapshot terraform state"
+                Invoke-Call ([ScriptBlock]::Create("$azBin storage blob snapshot --account-name `"$($tfBackendStorageAccountName)`" --container-name `"$($tfBackendContainerName)`" --name `"$($tfBackendKey)env:$($environmentShort)`" --output json")) | ConvertFrom-Json
+                Log-Message -message "END: Snapshot terraform state"
+
                 if ($tfPlanEncryption) {
                     Log-Message -message "START: Decrypt terraform plan"
                     Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -a -d -salt -in `"$($tfPlanFile).enc`" -out `"$($tfPlanFile)`" -pass `"pass:$($tfEncPassword)`""))
@@ -285,6 +294,10 @@ Process {
                 Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
                 Log-Message -message "END: terraform init"
 
+                Log-Message -message "START: Snapshot terraform state."
+                Invoke-Call ([ScriptBlock]::Create("$azBin storage blob snapshot --account-name `"$($tfBackendStorageAccountName)`" --container-name `"$($tfBackendContainerName)`" --name `"$($tfBackendKey)env:$($environmentShort)`" --output json")) | ConvertFrom-Json
+                Log-Message -message "END: Snapshot terraform state."
+
                 Log-Message -message "START: terraform destroy"
                 Log-Message -message "INFO: Manual input required"
                 $destroyConfirmation = Read-Host -Prompt "Continue and destroy $($tfFolderName) (environment: $($environmentShort))? [y/n]"
@@ -316,6 +329,10 @@ Process {
                 Log-Message -message "INFO: terraform workspace $($environmentShort) selected"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
                 Log-Message -message "END: terraform init"
+
+                Log-Message -message "START: Snapshot terraform state."
+                Invoke-Call ([ScriptBlock]::Create("$azBin storage blob snapshot --account-name `"$($tfBackendStorageAccountName)`" --container-name `"$($tfBackendContainerName)`" --name `"$($tfBackendKey)env:$($environmentShort)`" --output json")) | ConvertFrom-Json
+                Log-Message -message "END: Snapshot terraform state."
 
                 Log-Message -message "START: terraform import"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin import -var-file=`"variables/$($environmentShort).tfvars`" -var-file=`"variables/common.tfvars`" $($tfImportResource)"))
