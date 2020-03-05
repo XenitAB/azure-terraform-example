@@ -7,13 +7,13 @@ variables:
   - name: prodEnvEnabled
     value: false
   - name: azureSubscription
-    value: 'azureRm'
+    value: "azureRm"
   - name: tfVersion
-    value: '0.12.19'
+    value: "0.12.21"
   - name: vmImage
-    value: 'ubuntu-latest'
+    value: "ubuntu-latest"
   - name: tfFolderName
-    value: 'tf-core-infra'
+    value: "tf-core-infra"
 
 name: $(Build.BuildId)
 
