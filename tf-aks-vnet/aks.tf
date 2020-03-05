@@ -59,3 +59,15 @@ resource "azurerm_kubernetes_cluster" "aks" {
     azurerm_role_assignment.vnetAssignment
   ]
 }
+
+data "azurerm_public_ip" "aksOutboundPips" {
+  for_each = {
+    for pip in azurerm_kubernetes_cluster.aks.network_profile[0].load_balancer_profile[0].effective_outbound_ips :
+    split("/", pip)[8] => {
+      name                = split("/", pip)[8]
+      resource_group_name = split("/", pip)[4]
+    }
+  }
+  name                = each.value.name
+  resource_group_name = each.value.resource_group_name
+}

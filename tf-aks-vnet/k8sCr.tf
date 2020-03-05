@@ -9,3 +9,15 @@ resource "kubernetes_cluster_role" "crCitrix" {
     verbs      = ["*"]
   }
 }
+
+resource "kubernetes_cluster_role" "crListNamespaces" {
+  metadata {
+    name = "cr-list-namespaces"
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["namespaces"]
+    verbs      = ["get", "list", "watch"]
+  }
+}
