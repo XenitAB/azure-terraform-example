@@ -18,9 +18,16 @@ jobs:
       azureSubscription: '${{ parameters.azureSubscription }}'
       addSpnToEnvironment: true
       scriptLocation: inlineScript
-      inlineScript: "pwsh .ci/Invoke-PipelineTask.ps1 -tfFolderName '$(tfFolderName)' -azureDevOps -build -tfVersion $(tfVersion) -environmentShort ${{ parameters.environment }} -artifactPath '$(Build.ArtifactStagingDirectory)'"
+      inlineScript: |
+        if [[ $opaBlastRadius == ?(-)+([0-9]) ]]; then
+          blastRadius=$opaBlastRadius
+        else
+          blastRadius=""
+        fi
+        pwsh .ci/Invoke-PipelineTask.ps1 -tfFolderName '$(tfFolderName)' -azureDevOps -build -tfVersion $(tfVersion) -environmentShort ${{ parameters.environment }} -artifactPath '$(Build.ArtifactStagingDirectory)' ${blastRadius:+ -opaBlastRadius $blastRadius}
     env:
       tfEncPassword: $(terraformEncryptionSecret)
+      opaBlastRadius: $(opaBlastRadius)
   
   - task: PublishPipelineArtifact@0
     displayName: 'Publish artifact'
