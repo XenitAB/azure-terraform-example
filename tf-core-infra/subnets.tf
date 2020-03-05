@@ -4,11 +4,11 @@ resource "azurerm_subnet" "normalSubnet" {
     subnet.name => subnet
     if subnet.aksSubnet == false
   }
-  name                      = "sn-${var.environmentShort}-${var.locationShort}-${var.commonName}-${each.value.name}"
-  resource_group_name       = data.azurerm_resource_group.rg.name
-  virtual_network_name      = azurerm_virtual_network.vnet.name
-  address_prefix            = each.value.cidr
-  network_security_group_id = azurerm_network_security_group.nsg[each.value.name].id
+  name                 = "sn-${var.environmentShort}-${var.locationShort}-${var.commonName}-${each.value.name}"
+  resource_group_name  = data.azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefix       = each.value.cidr
+  service_endpoints    = each.value.service_endpoints
 }
 
 resource "azurerm_subnet" "subnet" {
@@ -21,10 +21,12 @@ resource "azurerm_subnet" "subnet" {
   resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefix       = each.value.cidr
+  service_endpoints    = each.value.service_endpoints
+}
 
-  lifecycle {
-    ignore_changes = [
-      route_table_id
-    ]
-  }
+resource "azurerm_subnet" "gatewaySubnet" {
+  name                 = "GatewaySubnet"
+  resource_group_name  = data.azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefix       = var.gatewaySubnet
 }
