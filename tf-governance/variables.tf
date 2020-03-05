@@ -28,8 +28,18 @@ variable "rgConfig" {
   type = list(
     object({
       commonName  = string
-      delegateAks = bool
+      delegateAks = bool # Delegate aks permissions 
+      delegateKv  = bool # Delegate KeyVault creation
+      delegateSe  = bool # Delegate Service Endpoint permissions
       tags        = map(string)
     })
   )
+}
+
+variable "kvDefaultPermissions" {
+  description = "Default permissions for key vault"
+  type = object({
+    key_permissions    = list(string)
+    secret_permissions = list(string)
+  })
 }
