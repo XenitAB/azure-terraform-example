@@ -40,11 +40,8 @@ resource "azuread_application_password" "aadSpSecret" {
 }
 
 resource "azurerm_key_vault_secret" "aadSpKvSecret" {
-  for_each = {
-    for rg in var.rgConfig :
-    rg.commonName => rg
-  }
-  name = azuread_service_principal.aadSp[each.key].display_name
+  for_each = { for rg in var.rgConfig : rg.commonName => rg }
+  name     = azuread_service_principal.aadSp[each.key].display_name
   value = jsonencode({
     tenantId       = data.azurerm_subscription.current.tenant_id
     subscriptionId = data.azurerm_subscription.current.subscription_id
