@@ -55,7 +55,8 @@ Param(
     [string]$tfBackendResourceGroup = "rg-$($environmentShort)-$($tfBackendResourceGroupLocationShort)-tfstate",
     [string]$tfBackendStorageAccountName = "strg$($environmentShort)$($tfBackendResourceGroupLocationShort)tfstate",
     [string]$tfBackendStorageAccountKind = "StorageV2",
-    [string]$tfBackendContainerName = "tfstate-$($tfFolderName)"
+    [string]$tfBackendContainerName = "tfstate-$($tfFolderName)",
+    [int]$opaBlastRadius = 50
 )
 
 Begin {
@@ -138,6 +139,7 @@ Process {
 
     if ($azureDevOps) {
         Log-Message -message "INFO: Running Azure DevOps specific configuration"
+
         # Download and extract Terraform
         Invoke-WebRequest -Uri "https://releases.hashicorp.com/terraform/$($tfVersion)/terraform_$($tfVersion)_linux_amd64.zip" -OutFile "/tmp/terraform_$($tfVersion)_linux_amd64.zip"
         Expand-Archive -Force -Path "/tmp/terraform_$($tfVersion)_linux_amd64.zip" -DestinationPath "/tmp"
@@ -145,6 +147,12 @@ Process {
         $chmodBin = $(Get-Command chmod -ErrorAction Stop)
         Invoke-Call ([ScriptBlock]::Create("$chmodBin +x $tfBin"))
         Log-Message -message "INFO: Using Terraform version $($tfVersion) from $($tfBin)"
+
+        # Download and extract OPA (Open Policy Agent)
+        Invoke-WebRequest -Uri "https://openpolicyagent.org/downloads/latest/opa_linux_amd64" -OutFile "/tmp/opa"
+        $opaBin = "/tmp/opa"
+        Invoke-Call ([ScriptBlock]::Create("$chmodBin +x $opaBin"))
+        Log-Message -message "INFO: Using Open Policy Agent (opa) from $($opaBin)"
 
         # Configure environment variables for Terraform
         $Subscriptions = Invoke-Call ([ScriptBlock]::Create("$azBin account list --output json")) | ConvertFrom-Json
@@ -193,6 +201,13 @@ Process {
         catch {
             Write-Error "Terraform isn't installed"
         }
+
+        try {
+            $opaBin = $(Get-Command opa -ErrorAction Stop)
+        }
+        catch {
+            Write-Error "OPA (Open Policy Agent) isn't installed"
+        }
     }
 
     switch ($PSCmdlet.ParameterSetName) {
@@ -224,10 +239,27 @@ Process {
                 Invoke-Call ([ScriptBlock]::Create("$tfBin plan -input=false -var-file=`"variables/$($environmentShort).tfvars`" -var-file=`"variables/common.tfvars`" -out=`"$($tfPlanFile)`""))
                 Log-Message -message "END: terraform plan"
 
+                Log-Message -message "START: open policy agent"
+                Invoke-Call ([ScriptBlock]::Create("$tfBin show -json `"$($tfPlanFile)`"")) | Out-File -Path "$($tfPlanFile).json"
+                Invoke-Call ([ScriptBlock]::Create("$opaBin test ../opa-policies/ -v"))
+                $opaData = Get-Content "../opa-policies/data.json" | ConvertFrom-Json
+                $opaData.blast_radius = $opaBlastRadius
+                $opaData | ConvertTo-Json | Out-File "/tmp/data.json"
+                $opaAuthz=Invoke-Call ([ScriptBlock]::Create("$opaBin eval --format pretty --data /tmp/data.json --data ../opa-policies/terraform.rego --input `"$($tfPlanFile).json`" `"data.terraform.analysis.authz`""))
+                $opaScore=Invoke-Call ([ScriptBlock]::Create("$opaBin eval --format pretty --data /tmp/data.json --data ../opa-policies/terraform.rego --input `"$($tfPlanFile).json`" `"data.terraform.analysis.score`""))
+                if ($opaAuthz -eq "true") {
+                    Log-Message -message "INFO: OPA Authorization: true (score: $($opaScore) / blast_radius: $($opaBlastRadius))"
+                } else {
+                    Log-Message -message "ERROR: OPA Authorization: false (score: $($opaScore) / blast_radius: $($opaBlastRadius))"
+                    Write-Error "OPA Authorization failed."
+                }
+                Log-Message -message "END: open policy agent"
+
                 if ($tfPlanEncryption) {
                     Log-Message -message "START: Encrypt terraform plan"
                     Invoke-Call ([ScriptBlock]::Create("$opensslBin enc -aes-256-cbc -a -salt -in `"$($tfPlanFile)`" -out `"$($tfPlanFile).enc`" -pass `"pass:$($tfEncPassword)`""))
-                    Remove-Item -Force -Path $tfPlanFile | Out-Null
+                    Remove-Item -Force -Path "$($tfPlanFile)" | Out-Null
+                    Remove-Item -Force -Path "$($tfPlanFile).json" | Out-Null
                     Log-Message -message "END: Encrypt terraform plan"
                 }
 
