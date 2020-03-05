@@ -4,6 +4,7 @@ resource "azurerm_storage_account" "storageAccountBackup" {
   location                 = data.azurerm_resource_group.rg.location
   account_tier             = "Standard"
   account_replication_type = "GRS"
+  account_kind             = "Storage"
 }
 
 resource "azurerm_storage_container" "storageContainerBackup" {
