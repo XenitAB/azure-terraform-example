@@ -59,9 +59,7 @@ rgConfig = [
     delegateKv  = false,
     delegateSe  = false,
     tags = {
-      "techContact" = "Xenit AB",
-      "description" = "Velocitas Azure Security Center",
-      "RF_ID"       = "Affärsstöd"
+      "description" = "Azure Security Center"
     }
   },
   {
