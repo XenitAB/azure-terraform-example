@@ -15,7 +15,7 @@ resource "azurerm_storage_container" "storageAccountContainer" {
 
 resource "null_resource" "downloadFedoraCoreOsImage" {
   provisioner "local-exec" {
-    command = "wget -qO- https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/${var.fedoraCoreOSConfiguration.imageVersion}/x86_64/fedora-coreos-${var.fedoraCoreOSConfiguration.imageVersion}-azure.x86_64.vhd.xz | gunzip -c > /tmp/fedora-coreos-${var.fedoraCoreOSConfiguration.imageVersion}-azure.x86_64.vhd"
+    command = "wget -qO- https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/${var.fedoraCoreOSConfiguration.imageVersion}/x86_64/fedora-coreos-${var.fedoraCoreOSConfiguration.imageVersion}-azure.x86_64.vhd.xz | unxz -c > /tmp/fedora-coreos-${var.fedoraCoreOSConfiguration.imageVersion}-azure.x86_64.vhd"
   }
 
   triggers = {
