@@ -6,14 +6,12 @@ variables:
     value: false
   - name: prodEnvEnabled
     value: false
-  - name: azureSubscription
-    value: "azureRm"
   - name: tfVersion
     value: "0.12.24"
   - name: vmImage
     value: "ubuntu-latest"
   - name: tfFolderName
-    value: "tf-aks"
+    value: "tf-azpipelines"
 
 name: $(Build.BuildId)
 
@@ -24,7 +22,7 @@ trigger:
       - master
   paths:
     include:
-      - tf-aks
+      - tf-azpipelines
 
 stages:
   - template: templates/pipeline.yml
