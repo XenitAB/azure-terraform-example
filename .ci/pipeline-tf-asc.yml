@@ -7,7 +7,7 @@ variables:
   - name: prodEnvEnabled
     value: true
   - name: tfVersion
-    value: "0.12.21"
+    value: "0.12.24"
   - name: vmImage
     value: "ubuntu-latest"
   - name: tfFolderName
