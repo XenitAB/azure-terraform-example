@@ -2,21 +2,6 @@ locals {
   vmBaseName = "vm-${var.environmentShort}-${var.locationShort}-${var.commonName}"
 }
 
-resource "random_password" "vmPassword" {
-  length  = 16
-  special = true
-
-  keepers = {
-    vmPassword = var.commonName
-  }
-}
-
-resource "azurerm_key_vault_secret" "vmPassword" {
-  name         = local.vmBaseName
-  value        = random_password.vmPassword.result
-  key_vault_id = data.azurerm_key_vault.kv.id
-}
-
 resource "azurerm_network_interface" "nic" {
   count               = var.envVmConfig.count
   name                = "nic-${local.vmBaseName}-${format("%02s", count.index + 1)}-01"
