@@ -24,5 +24,6 @@ fedoraCoreOSConfiguration = {
 
 azureDevOpsConfiguration = {
   azpPoolSuffix = "-ubuntu"
-  azpImageTag   = "ubuntu-16.04-docker-18.06.1-ce-standard"
+  azpImage      = "quay.io/xenitab/azp-agent"
+  azpImageTag   = "stable"
 }

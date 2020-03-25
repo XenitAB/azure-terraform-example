@@ -23,11 +23,12 @@ resource "azurerm_network_interface_backend_address_pool_association" "nicAlbBeA
 }
 
 resource "azurerm_virtual_machine" "vm" {
-  count               = var.envVmConfig.count
-  name                = "${local.vmBaseName}-${format("%02s", count.index + 1)}"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
-  vm_size             = var.envVmConfig.size
+  count                         = var.envVmConfig.count
+  name                          = "${local.vmBaseName}-${format("%02s", count.index + 1)}"
+  location                      = data.azurerm_resource_group.rg.location
+  resource_group_name           = data.azurerm_resource_group.rg.name
+  vm_size                       = var.envVmConfig.size
+  delete_os_disk_on_termination = true
 
   network_interface_ids = [
     azurerm_network_interface.nic[count.index].id
@@ -61,6 +62,7 @@ resource "azurerm_virtual_machine" "vm" {
         AZP_ACCOUNT    = jsondecode(data.azurerm_key_vault_secret.kvSecretAzurePipelinesAgent.value).azp_account,
         AZP_TOKEN      = jsondecode(data.azurerm_key_vault_secret.kvSecretAzurePipelinesAgent.value).azp_token,
         AZP_POOL       = "${var.environmentShort}${var.azureDevOpsConfiguration.azpPoolSuffix}",
+        AZP_IMAGE      = var.azureDevOpsConfiguration.azpImage,
         AZP_IMAGE_TAG  = var.azureDevOpsConfiguration.azpImageTag
       }
     )))

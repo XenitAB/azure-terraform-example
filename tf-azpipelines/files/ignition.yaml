@@ -61,8 +61,8 @@ systemd:
         TimeoutStartSec=0
         ExecStartPre=-/usr/bin/docker kill azp-agent-01
         ExecStartPre=-/usr/bin/docker rm azp-agent-01
-        ExecStartPre=/usr/bin/docker pull mcr.microsoft.com/azure-pipelines/vsts-agent:${AZP_IMAGE_TAG}
-        ExecStart=/usr/bin/docker run --name azp-agent-01 --hostname ${HOSTNAME}-azp-agent-01 -e VSTS_ACCOUNT=${AZP_ACCOUNT} -e VSTS_TOKEN=${AZP_TOKEN} -e VSTS_POOL=${AZP_POOL} -v /etc/hosts:/etc/hosts:ro -v /var/run/docker.sock:/var/run/docker.sock mcr.microsoft.com/azure-pipelines/vsts-agent:${AZP_IMAGE_TAG}
+        ExecStartPre=/usr/bin/docker pull ${AZP_IMAGE}:${AZP_IMAGE_TAG}
+        ExecStart=/usr/bin/docker run --privileged=true --name azp-agent-01 --hostname ${HOSTNAME}-azp-agent-01 -e VSTS_ACCOUNT=${AZP_ACCOUNT} -e VSTS_TOKEN=${AZP_TOKEN} -e VSTS_POOL=${AZP_POOL} -v /etc/hosts:/etc/hosts:ro -v /var/run/docker.sock:/var/run/docker.sock ${AZP_IMAGE}:${AZP_IMAGE_TAG}
 
         [Install]
         WantedBy=multi-user.target
@@ -80,8 +80,8 @@ systemd:
         TimeoutStartSec=0
         ExecStartPre=-/usr/bin/docker kill azp-agent-02
         ExecStartPre=-/usr/bin/docker rm azp-agent-02
-        ExecStartPre=/usr/bin/docker pull mcr.microsoft.com/azure-pipelines/vsts-agent:${AZP_IMAGE_TAG}
-        ExecStart=/usr/bin/docker run --name azp-agent-02 --hostname ${HOSTNAME}-azp-agent-02 -e VSTS_ACCOUNT=${AZP_ACCOUNT} -e VSTS_TOKEN=${AZP_TOKEN} -e VSTS_POOL=${AZP_POOL} -v /etc/hosts:/etc/hosts:ro -v /var/run/docker.sock:/var/run/docker.sock mcr.microsoft.com/azure-pipelines/vsts-agent:${AZP_IMAGE_TAG}
+        ExecStartPre=/usr/bin/docker pull ${AZP_IMAGE}:${AZP_IMAGE_TAG}
+        ExecStart=/usr/bin/docker run --privileged=true --name azp-agent-02 --hostname ${HOSTNAME}-azp-agent-02 -e VSTS_ACCOUNT=${AZP_ACCOUNT} -e VSTS_TOKEN=${AZP_TOKEN} -e VSTS_POOL=${AZP_POOL} -v /etc/hosts:/etc/hosts:ro -v /var/run/docker.sock:/var/run/docker.sock ${AZP_IMAGE}:${AZP_IMAGE_TAG}
 
         [Install]
         WantedBy=multi-user.target
