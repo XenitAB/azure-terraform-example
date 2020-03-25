@@ -63,6 +63,7 @@ variable "azureDevOpsConfiguration" {
   description = "Azure DevOps Configuration"
   type = object({
     azpPoolSuffix = string
+    azpImage      = string
     azpImageTag   = string
   })
 }
