@@ -64,7 +64,8 @@ resource "azurerm_key_vault_secret" "delegateKvAadSpKvSecretClientId" {
   key_vault_id = azurerm_key_vault.delegateKv[each.key].id
 
   depends_on = [
-    azurerm_key_vault_access_policy.delegateKvApKvreaderSp
+    azurerm_key_vault_access_policy.delegateKvApKvreaderSp,
+    azurerm_key_vault_access_policy.delegateKvApCurSpn
   ]
 }
 
@@ -80,7 +81,8 @@ resource "azurerm_key_vault_secret" "delegateKvAadSpKvSecretClientSecret" {
   key_vault_id = azurerm_key_vault.delegateKv[each.key].id
 
   depends_on = [
-    azurerm_key_vault_access_policy.delegateKvApKvreaderSp
+    azurerm_key_vault_access_policy.delegateKvApKvreaderSp,
+    azurerm_key_vault_access_policy.delegateKvApCurSpn
   ]
 }
 
@@ -96,6 +98,7 @@ resource "azurerm_key_vault_secret" "delegateKvAadSpKvSecretKeyVaultName" {
   key_vault_id = azurerm_key_vault.delegateKv[each.key].id
 
   depends_on = [
-    azurerm_key_vault_access_policy.delegateKvApKvreaderSp
+    azurerm_key_vault_access_policy.delegateKvApKvreaderSp,
+    azurerm_key_vault_access_policy.delegateKvApCurSpn
   ]
 }

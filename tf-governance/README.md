@@ -15,12 +15,15 @@ This will setup the following resources:
 
 You need to update the variables before running the playbook in `variables/common.tfvars`.
 
-### Azure KeyVault
+# Import tfstate to different environments
 
-The first time you run this, you will need to comment out (`#`) the KeyVault specifics until it is created with `tf-core-infra`.
-
-The following addresses should be commented at the first run:
-
-* `azurerm_key_vault_secret.aadSpKvSecret` in `spSubReader.tf`
-* `azurerm_key_vault_secret.aadSubReaderSpKvSecret` in `sp.tf`
-* `data.azurerm_key_vault.coreKv` in `kv.tf`
+```bash
+rm -rf tf-governance/.terraform
+ENVIRONMENT=dev
+az account set --subscription SubscriptionName-$ENVIRONMENT
+AZ_SUBSCRIPTION_ID=$(az account show --out tsv --query 'id')
+pwsh .ci/Invoke-PipelineTask.ps1 -tfFolderName tf-governance -build -environmentShort $ENVIRONMENT
+cd tf-governance
+terraform import -var-file=variables/common.tfvars -var-file=variables/$ENVIRONMENT.tfvars 'azurerm_resource_group.rg["tfstate"]' /subscriptions/$AZ_SUBSCRIPTION_ID/resourceGroups/rg-$ENVIRONMENT-we-tfstate
+cd ..
+```

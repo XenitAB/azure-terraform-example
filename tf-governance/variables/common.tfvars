@@ -47,7 +47,7 @@ rgConfig = [
   {
     commonName  = "tflab",
     delegateAks = false,
-    delegateKv  = false,
+    delegateKv  = true,
     delegateSe  = false,
     tags = {
       "description" = "Core infrastructure"

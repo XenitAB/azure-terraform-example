@@ -35,12 +35,16 @@ resource "azuread_application_password" "aadSubReaderSpSecret" {
 }
 
 resource "azurerm_key_vault_secret" "aadSubReaderSpKvSecret" {
-  name = azuread_service_principal.aadSubReaderSp.display_name
+  name = replace(azuread_service_principal.aadSubReaderSp.display_name, ".", "-")
   value = jsonencode({
     tenantId       = data.azurerm_subscription.current.tenant_id
     subscriptionId = data.azurerm_subscription.current.subscription_id
     clientId       = azuread_service_principal.aadSubReaderSp.application_id
     clientSecret   = random_password.aadSubReaderSpSecret.result
   })
-  key_vault_id = data.azurerm_key_vault.coreKv.id
+  key_vault_id = azurerm_key_vault.delegateKv[var.coreCommonName].id
+
+  depends_on = [
+    azurerm_key_vault_access_policy.delegateKvApCurSpn
+  ]
 }

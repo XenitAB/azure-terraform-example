@@ -41,12 +41,16 @@ resource "azuread_application_password" "aadSpSecret" {
 
 resource "azurerm_key_vault_secret" "aadSpKvSecret" {
   for_each = { for rg in var.rgConfig : rg.commonName => rg }
-  name     = azuread_service_principal.aadSp[each.key].display_name
+  name     = replace(azuread_service_principal.aadSp[each.key].display_name, ".", "-")
   value = jsonencode({
     tenantId       = data.azurerm_subscription.current.tenant_id
     subscriptionId = data.azurerm_subscription.current.subscription_id
     clientId       = azuread_service_principal.aadSp[each.key].application_id
     clientSecret   = random_password.aadSpSecret[each.key].result
   })
-  key_vault_id = data.azurerm_key_vault.coreKv.id
+  key_vault_id = azurerm_key_vault.delegateKv[var.coreCommonName].id
+
+  depends_on = [
+    azurerm_key_vault_access_policy.delegateKvApCurSpn
+  ]
 }
