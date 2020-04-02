@@ -131,6 +131,26 @@ Begin {
         }
     }
 
+    function Invoke-TerraformInit {
+        Log-Message -message "START: terraform init"
+        Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfBackendKey)`" -backend-config=`"resource_group_name=$($tfBackendResourceGroup)`" -backend-config=`"storage_account_name=$($tfBackendStorageAccountName)`" -backend-config=`"container_name=$($tfBackendContainerName)`""))
+        try {
+            Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($environmentShort)")) -SilentNoExit
+            Log-Message -message "INFO: terraform workspace $($environmentShort) created"
+        }
+        catch {
+            Log-Message -message "INFO: terraform workspace $($environmentShort) already exists"
+        }
+        Log-Message -message "START: terraform workspace select $($environmentShort)"
+        Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
+        Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfBackendKey)`" -backend-config=`"resource_group_name=$($tfBackendResourceGroup)`" -backend-config=`"storage_account_name=$($tfBackendStorageAccountName)`" -backend-config=`"container_name=$($tfBackendContainerName)`""))
+        Log-Message -message "END: terraform workspace select $($environmentShort)"
+
+        Log-Message -message "START: Snapshot terraform state"
+        Invoke-Call ([ScriptBlock]::Create("$azBin storage blob snapshot --account-name `"$($tfBackendStorageAccountName)`" --container-name `"$($tfBackendContainerName)`" --name `"$($tfBackendKey)env:$($environmentShort)`" --output json")) | ConvertFrom-Json
+        Log-Message -message "END: Snapshot terraform state"
+    }
+
 }
 Process {
     Set-Location -Path $tfPath -ErrorAction Stop
@@ -214,22 +234,7 @@ Process {
         'build' {
             Log-Message -message "START: Build" -header
             try {
-                Log-Message -message "START: terraform init"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfBackendKey)`" -backend-config=`"resource_group_name=$($tfBackendResourceGroup)`" -backend-config=`"storage_account_name=$($tfBackendStorageAccountName)`" -backend-config=`"container_name=$($tfBackendContainerName)`""))
-                try {
-                    Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($environmentShort)")) -SilentNoExit
-                    Log-Message -message "INFO: terraform workspace $($environmentShort) created"
-                }
-                catch {
-                    Log-Message -message "INFO: terraform workspace $($environmentShort) already exists"
-                }
-                Log-Message -message "INFO: terraform workspace $($environmentShort) selected"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
-                Log-Message -message "END: terraform init"
-
-                Log-Message -message "START: Snapshot terraform state"
-                Invoke-Call ([ScriptBlock]::Create("$azBin storage blob snapshot --account-name `"$($tfBackendStorageAccountName)`" --container-name `"$($tfBackendContainerName)`" --name `"$($tfBackendKey)env:$($environmentShort)`" --output json")) | ConvertFrom-Json
-                Log-Message -message "END: Snapshot terraform state"
+                Invoke-TerraformInit
 
                 Log-Message -message "START: terraform validate"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin validate"))
@@ -275,22 +280,7 @@ Process {
         'deploy' {
             Log-Message -message "START: Deploy" -header
             try {
-                Log-Message -message "START: terraform init"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfBackendKey)`" -backend-config=`"resource_group_name=$($tfBackendResourceGroup)`" -backend-config=`"storage_account_name=$($tfBackendStorageAccountName)`" -backend-config=`"container_name=$($tfBackendContainerName)`""))
-                try {
-                    Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($environmentShort)")) -SilentNoExit
-                    Log-Message -message "INFO: terraform workspace $($environmentShort) created"
-                }
-                catch {
-                    Log-Message -message "INFO: terraform workspace $($environmentShort) already exists"
-                }
-                Log-Message -message "INFO: terraform workspace $($environmentShort) selected"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
-                Log-Message -message "END: terraform init"
-
-                Log-Message -message "START: Snapshot terraform state"
-                Invoke-Call ([ScriptBlock]::Create("$azBin storage blob snapshot --account-name `"$($tfBackendStorageAccountName)`" --container-name `"$($tfBackendContainerName)`" --name `"$($tfBackendKey)env:$($environmentShort)`" --output json")) | ConvertFrom-Json
-                Log-Message -message "END: Snapshot terraform state"
+                Invoke-TerraformInit
 
                 if ($tfPlanEncryption) {
                     Log-Message -message "START: Decrypt terraform plan"
@@ -313,22 +303,7 @@ Process {
         'destroy' {
             Log-Message -message "START: Destroy" -header
             try {
-                Log-Message -message "START: terraform init"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfBackendKey)`" -backend-config=`"resource_group_name=$($tfBackendResourceGroup)`" -backend-config=`"storage_account_name=$($tfBackendStorageAccountName)`" -backend-config=`"container_name=$($tfBackendContainerName)`""))
-                try {
-                    Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($environmentShort)")) -SilentNoExit
-                    Log-Message -message "INFO: terraform workspace $($environmentShort) created"
-                }
-                catch {
-                    Log-Message -message "INFO: terraform workspace $($environmentShort) already exists"
-                }
-                Log-Message -message "INFO: terraform workspace $($environmentShort) selected"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
-                Log-Message -message "END: terraform init"
-
-                Log-Message -message "START: Snapshot terraform state."
-                Invoke-Call ([ScriptBlock]::Create("$azBin storage blob snapshot --account-name `"$($tfBackendStorageAccountName)`" --container-name `"$($tfBackendContainerName)`" --name `"$($tfBackendKey)env:$($environmentShort)`" --output json")) | ConvertFrom-Json
-                Log-Message -message "END: Snapshot terraform state."
+                Invoke-TerraformInit
 
                 Log-Message -message "START: terraform destroy"
                 Log-Message -message "INFO: Manual input required"
@@ -349,22 +324,7 @@ Process {
         'import' {
             Log-Message -message "START: Destroy" -header
             try {
-                Log-Message -message "START: terraform init"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin init -input=false -backend-config `"key=$($tfBackendKey)`" -backend-config=`"resource_group_name=$($tfBackendResourceGroup)`" -backend-config=`"storage_account_name=$($tfBackendStorageAccountName)`" -backend-config=`"container_name=$($tfBackendContainerName)`""))
-                try {
-                    Invoke-Call ([ScriptBlock]::Create("$tfBin workspace new $($environmentShort)")) -SilentNoExit
-                    Log-Message -message "INFO: terraform workspace $($environmentShort) created"
-                }
-                catch {
-                    Log-Message -message "INFO: terraform workspace $($environmentShort) already exists"
-                }
-                Log-Message -message "INFO: terraform workspace $($environmentShort) selected"
-                Invoke-Call ([ScriptBlock]::Create("$tfBin workspace select $($environmentShort)"))
-                Log-Message -message "END: terraform init"
-
-                Log-Message -message "START: Snapshot terraform state."
-                Invoke-Call ([ScriptBlock]::Create("$azBin storage blob snapshot --account-name `"$($tfBackendStorageAccountName)`" --container-name `"$($tfBackendContainerName)`" --name `"$($tfBackendKey)env:$($environmentShort)`" --output json")) | ConvertFrom-Json
-                Log-Message -message "END: Snapshot terraform state."
+                Invoke-TerraformInit
 
                 Log-Message -message "START: terraform import"
                 Invoke-Call ([ScriptBlock]::Create("$tfBin import -var-file=`"variables/$($environmentShort).tfvars`" -var-file=`"variables/common.tfvars`" $($tfImportResource)"))
