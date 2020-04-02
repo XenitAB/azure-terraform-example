@@ -15,6 +15,6 @@ resource "azurerm_subnet_network_security_group_association" "nsgAssociations" {
     subnet.name => subnet
     if subnet.aksSubnet == false
   }
-  subnet_id                 = azurerm_subnet.normalSubnet[each.key].id
+  subnet_id                 = azurerm_subnet.subnet[each.key].id
   network_security_group_id = azurerm_network_security_group.nsg[each.key].id
 }
