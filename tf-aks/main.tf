@@ -5,13 +5,13 @@ terraform {
 
 # Configure the Azure Provider
 provider "azurerm" {
-  version = "=2.0.0"
+  version = "=2.3.0"
   features {}
 }
 
 # Configure the Azure AD Provider
 provider "azuread" {
-  version = "=0.7.0"
+  version = "=0.8.0"
 }
 
 # Configure the Kubernetes Provider

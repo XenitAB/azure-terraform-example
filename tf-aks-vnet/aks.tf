@@ -3,14 +3,14 @@ resource "azurerm_kubernetes_cluster" "aks" {
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   dns_prefix          = "aks-${var.environmentShort}-${var.locationShort}-${var.commonName}"
-  kubernetes_version  = "1.15.7"
+  kubernetes_version  = var.aksConfiguration.default_node_pool_kubernetes_version
 
   default_node_pool {
     name       = "default"
-    node_count = 3
-    max_count  = 10
-    min_count  = 2
-    vm_size    = "Standard_D2_v2"
+    node_count = var.aksConfiguration.default_node_pool_min_count
+    min_count  = var.aksConfiguration.default_node_pool_min_count
+    max_count  = var.aksConfiguration.default_node_pool_max_count
+    vm_size    = var.aksConfiguration.default_node_pool_vm_size
     availability_zones = [
       "1",
       "2",
@@ -70,4 +70,8 @@ data "azurerm_public_ip" "aksOutboundPips" {
   }
   name                = each.value.name
   resource_group_name = each.value.resource_group_name
+
+  depends_on = [
+    azurerm_kubernetes_cluster.aks
+  ]
 }

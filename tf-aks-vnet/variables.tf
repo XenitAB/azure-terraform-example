@@ -48,3 +48,13 @@ variable "k8sSaNamespace" {
   description = "The namespaced used to store service accounts."
   type        = string
 }
+
+variable "aksConfiguration" {
+  description = "The Azure Kubernetes Service (AKS) configuration"
+  type = object({
+    default_node_pool_kubernetes_version = string
+    default_node_pool_vm_size            = string
+    default_node_pool_min_count          = number
+    default_node_pool_max_count          = number
+  })
+}

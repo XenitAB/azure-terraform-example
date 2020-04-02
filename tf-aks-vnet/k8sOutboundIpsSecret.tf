@@ -17,4 +17,8 @@ resource "kubernetes_secret" "k8sOutboundIpsSecret" {
       ]
     )
   }
+
+  depends_on = [
+    data.azurerm_public_ip.aksOutboundPips
+  ]
 }

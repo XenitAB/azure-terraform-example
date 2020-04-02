@@ -1,4 +1,4 @@
-resource "azurerm_subnet" "normalSubnet" {
+resource "azurerm_subnet" "subnet" {
   for_each = {
     for subnet in var.vnetConfig.subnets :
     subnet.name => subnet
@@ -11,7 +11,7 @@ resource "azurerm_subnet" "normalSubnet" {
   service_endpoints    = each.value.service_endpoints
 }
 
-resource "azurerm_subnet" "subnet" {
+resource "azurerm_subnet" "subnetAks" {
   for_each = {
     for subnet in var.vnetConfig.subnets :
     subnet.name => subnet
